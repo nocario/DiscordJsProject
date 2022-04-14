@@ -1,0 +1,18 @@
+{
+  "name": "discordjsproject",
+  "version": "1.0.0",
+  "description": "Bot for discord with discord.js, for Js class",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ramda": "^0.28.0",
+    "xo": "^0.48.0"
+  },
+  "dependencies": {
+    "discord.js": "^13.6.0"
+  }
+}
