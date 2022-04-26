@@ -8,8 +8,6 @@ const fs = require('node:fs');
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-
-
 const client = new Discord.Client({ intents:
         [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] })
 /*
@@ -59,8 +57,73 @@ const curriedCheckExecuteEvent = R.curry(checkExecuteEvent)(client);
 
 events(curriedCheckExecuteEvent, eventFiles);
 
+//----------------------------------------------------------------------------------------------------------------------
+
+const comms = require("./events/comms.js"); // Подключаем файл с командами для бота
+let config = require('./config.json'); // Подключаем файл с параметрами и информацией
+let prefix = config.prefix;
+
+client.on('message', (msg) => {
+    if (msg.author.username !== client.user.username && msg.author.discriminator !== client.user.discriminator) {
+        let comm = msg.content.trim() + " ";
+        let comm_name = comm.slice(0, comm.indexOf(" "));
+        let messArr = comm.split(" ");
+        for (comm_count in comms.comms) {
+            let comm2 = prefix + comms.comms[comm_count].name;
+            if (comm2 == comm_name) {
+                comms.comms[comm_count].out(client, msg, messArr);
+            }
+        }
+    }
+});
+const fetch = require('node-fetch');
+
+client.on('message', async message => {
+
+    if (message.content.toLowerCase().startsWith('-test')){
+        const response = await fetch('https://opentdb.com/api.php?amount=8&category=10&type=boolean');
+        const data = await response.json();
+
+        let length = data.results.length;
+
+        let randomNumber = Math.floor(Math.random() * length);
+        let randomQuestion = data.results[randomNumber];
+        let question = randomQuestion.question;
+        let correctAnswer = randomQuestion.correct_answer;
 
 
+        message.channel.send(question);
+
+
+
+        const filter = m => m.author.id === message.author.id;
+
+        console.log(message.author.username);
+
+
+
+        const answer = await message.channel.awaitMessages({filter : filter,
+            maxMatches: 1, time: 10000,  errors: ['time', 'maxMatches']});
+        console.log(answer);
+
+        const ans = answer.first();
+
+
+        if(ans.content.toLowerCase() === correctAnswer.toLowerCase())
+        {
+            message.channel.send('You got the question right');
+        } else {
+            message.channel.send('That is incorrect');
+        }
+    }
+});
+
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 client.login(token).then()
 
