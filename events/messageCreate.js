@@ -7,6 +7,7 @@ module.exports = {
         if (isBiggus(msg.content)) {
             msg.reply("https://www.youtube.com/watch?v=yzgS61zgPEg");
         }
-        console.log(msg.guildId)
+        //msg.delete();
+        //setTimeout(() => msg.delete(), 5000);
     },
 };
