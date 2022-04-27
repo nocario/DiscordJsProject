@@ -81,38 +81,9 @@ const fetch = require('node-fetch');
 const {MessageEmbed} = require("discord.js");
 
 
+
 client.on('messageCreate', async message => {
-if (message.content === 'poll') {
-    let embedPoll = new Discord.MessageEmbed()
-         .setColor('YELLOW')
-        .addField('1:', 'name')
-        .addField('2:', 'name2')
-        .addField('3:', 'name3');
 
-    let reactions = ['1️⃣', '2️⃣', '3️⃣'];
-    let msgEmbed = await message.channel.send({ embeds: [embedPoll] });
-
-    reactions.forEach((reaction) => msgEmbed.react(reaction));
-
-    const filter = (reaction) => reactions.includes(reaction.emoji.name);
-    const collector = msgEmbed.createReactionCollector({ filter, time:1111 });
-
-    // code inside this runs every time someone reacts with those emojis
-    collector.on('collect', (reaction, user) => {
-        message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
-
-        console.log(`Just collected a ${reaction.emoji.name} reaction from ${user.username}`);
-    });
-
-
-
-    collector.on('end', collected => {
-        console.log(`Collected ${collected.size} interactions.`);
-    });
-}
-
-});
-client.on('messageCreate', async message => {
 
 
     if (message.content.toLowerCase().startsWith('-test')){
@@ -167,7 +138,7 @@ client.on('messageCreate', async message => {
     }
 
     if (message.content.toLowerCase().startsWith('-m')){
-        const response = await fetch('https://opentdb.com/api.php?amount=10&category=10&difficulty=medium&type=multiple');
+        const response = await fetch('https://opentdb.com/api.php?amount=3&category=10&difficulty=medium&type=multiple');
         const data = await response.json();
 
         const embed = new MessageEmbed();
@@ -221,10 +192,12 @@ client.on('messageCreate', async message => {
                 return (reaction.emoji.name === answer) && !user.bot;
             };
 
+
+
+
             const collector = msgEmbed.createReactionCollector({filter, time: 30000 }); // will only collect for 10 seconds, and take one correct answer
 
             collector.on('collect', (reaction, user) => {
-
                 console.log('usersWithCorrectAnswer')
                 usersWithCorrectAnswer.push(user.username);
                 console.log(usersWithCorrectAnswer)
@@ -256,6 +229,8 @@ client.on('messageCreate', async message => {
 
                 }
             });
+            await new Promise(resolve => setTimeout(resolve, 30000));
+
         }
     }
 });
