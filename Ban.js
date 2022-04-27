@@ -77,7 +77,11 @@ const banWarnedMember = R.pipe(R.forEach(R.ifElse(
 //----------------------------------------------------------------------------------------------------------------------
 
 const checkIfStillPlayingGame = R.pipe(R.prop('user'), checkIfPlayingGame);
-const checkIfPLayingSameBannedGame = R.pipe(R.prop('user'), curriedCheckIfPlayingForbiddenGame)
+const getGameName = (member) => member.user.presence?.activities
+    .find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase();
+const checkIfPLayingSameBannedGame = (member) => R.equals(getGameName(member), R.prop('gamePlayed', member));
+//const checkIfPLayingSameBannedGame = R.pipe(R.prop('user'), curriedCheckIfPlayingForbiddenGame);
+//const checkIfPLayingSameBannedGame = R.pipe(fn);
 const checkWarnedMember = R.pipe(
     R.filter(checkIfStillPlayingGame),
     R.filter(checkIfPLayingSameBannedGame),
