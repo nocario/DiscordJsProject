@@ -80,9 +80,31 @@ const fetch = require('node-fetch');
 
 client.on('message', async message => {
 
+    if (message.content.startsWith('!collector')) {
+        // Filters define what kinds of messages should be collected
+        let filter = (message) => !message.author.bot;
+
+        let collector = message.channel.createMessageCollector(filter, {max: 1, time: 15000});
+
+        // The 'collect' event will fire whenever the collector receives input
+        collector.on('collect', (m) => {
+            console.log(`Collected ${m.content}`);
+        });
+
+        // The 'end' event will fire when the collector is finished.
+        collector.on('end', (collected) => {
+            console.log(`Collected ${collected.size} items`);
+        });
+
+        message.reply('What is your favorite color?');
+    }
+
     if (message.content.toLowerCase().startsWith('-test')){
         const response = await fetch('https://opentdb.com/api.php?amount=8&category=10&type=boolean');
         const data = await response.json();
+
+        console.log(data);
+
 
         let length = data.results.length;
 
@@ -91,22 +113,33 @@ client.on('message', async message => {
         let question = randomQuestion.question;
         let correctAnswer = randomQuestion.correct_answer;
 
+        console.log(question);
 
         message.channel.send(question);
 
 
 
-        const filter = m => m.author.id === message.author.id;
+
+
+        //const filter = m => m.author.id === message.author.id;
+
+        let filter = (message) => !message.author.bot;
 
         console.log(message.author.username);
 
+        console.log(message.author.username);
 
+        const answer = await message.channel.awaitMessages({ filter, max: 1, time: 10_000, errors: ['time']})
+             ;
 
-        const answer = await message.channel.awaitMessages({filter : filter,
-            maxMatches: 1, time: 10000,  errors: ['time', 'maxMatches']});
-        console.log(answer);
+        //const answer = await message.channel.awaitMessages(filter, {max: 1, time: 10000, errors: ['time', 'maxMatches']})
+        //    .then(collected => message.channel.send(collected.first().content))
+        //    .catch(collected => console.log(`After a minute, only ${collected.size} out of 4 voted.`));
+
 
         const ans = answer.first();
+
+        message.channel.send(ans);
 
 
         if(ans.content.toLowerCase() === correctAnswer.toLowerCase())
@@ -117,9 +150,6 @@ client.on('message', async message => {
         }
     }
 });
-
-
-
 
 
 
