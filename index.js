@@ -116,7 +116,7 @@ client.on('messageCreate', async message => {
 
 
     if (message.content.toLowerCase().startsWith('-test')){
-        const response = await fetch('https://opentdb.com/api.php?amount=8&category=10&type=boolean');
+        const response = await fetch('https://opentdb.com/api.php?amount=10&category=10&type=boolean');
         const data = await response.json();
 
         console.log(data);
@@ -167,16 +167,12 @@ client.on('messageCreate', async message => {
     }
 
     if (message.content.toLowerCase().startsWith('-m')){
-        const response = await fetch('https://opentdb.com/api.php?amount=1&category=10&difficulty=medium&type=multiple');
+        const response = await fetch('https://opentdb.com/api.php?amount=10&category=10&difficulty=medium&type=multiple');
         const data = await response.json();
 
-        const embed = new MessageEmbed(); // creates new embed instance
-        let counter = 10; // a counter that will help us execute the other channel messages later (helps us keep track of loop iterations)
-        let stopped = false;
+        const embed = new MessageEmbed();
         let leaderboard = {};
-
-
-
+        let usersWithCorrectAnswer = [];
 
 
         console.log(data.results)
@@ -189,126 +185,79 @@ client.on('messageCreate', async message => {
 
             embed
                 .setTitle(`Question ${i + 1}`) // Title dynamically updates depending on which iteration we're on
-                .setColor('#5fdbe3') // color of the embed
+                .setColor('YELLOW')
                 .setDescription(
-                    // the meat and potatoes of the embed
-                    (data.results[i].question) + // the question
-                    '\n' + // added a space
-                    '\n**Choices:**' + // added a space
-                    '\n' +
-                    '\n🇦 ' +
-                     (choices[0]) + // outputs the choices from the array 'choices'
-                    '\n🇧 ' +
-                     (choices[1]) +
-                    '\n🇨 ' +
-                     (choices[2]) +
-                    '\n🇩 ' +
-                    (choices[3]) +
-                    '\n' +
-                    '\n**Difficulty:** ' +
+                    (data.results[i].question) +
+                    '\n' + '\n**Choices:**' + '\n' +
+                    '\n💛 ' + (choices[0]) + '\n' +
+                    '\n💚 ' + (choices[1]) + '\n' +
+                    '\n💙 ' + (choices[2]) + '\n' +
+                    '\n💜 ' + (choices[3]) + '\n' +
+                    '\n' + '\n**Difficulty:** ' +
                      (data.results[i].difficulty) + // difficulty
                     '\n**Category:** ' +
                      (data.results[i].category) // category
                 );
 
 
-
-            const e = new MessageEmbed()
-                .setColor('#0xf2ff00')
-                .setTitle(data.results[i].question); // Title dynamically updates depending on which iteration we're on
-
-
-
-            let reactions = ['🇦', '🇧', '🇨', '🇩', '🛑'];
+            let reactions = ['💛', '💚', '💙', '💜'];
             let msgEmbed = await message.channel.send({ embeds: [embed] });
 
             reactions.forEach((reaction) => msgEmbed.react(reaction));
 
-            let answer = ''; // instantiate empty answer string, where correctAns will be housed
+            let answer = '';
 
             if (data.results[i].correct_answer === choices[0]) {
-                answer = '🇦';
+                answer = '💛';
             } else if (data.results[i].correct_answer === choices[1]) {
-                answer = '🇧';
+                answer = '💚';
             } else if (data.results[i].correct_answer === choices[2]) {
-                answer = '🇨';
+                answer = '💙';
             } else {
-                answer = '🇩';
+                answer = '💜';
             }
 
-
-
-            console.log(answer)
             const filter = (reaction, user) => {
-                // filters only the reactions that are equal to the answer
-                return (reaction.emoji.name === answer || reaction.emoji.name === '🛑')
-                    && user.username !== this.client.user.username;
+                return (reaction.emoji.name === answer) && !user.bot;
             };
 
-
-            const collector = msgEmbed.createReactionCollector({filter, time: 10000 }); // will only collect for 10 seconds, and take one correct answer
-
-            let usersWithCorrectAnswer = [];
+            const collector = msgEmbed.createReactionCollector({filter, time: 30000 }); // will only collect for 10 seconds, and take one correct answer
 
             collector.on('collect', (reaction, user) => {
-                if (reaction.emoji.name === '🛑' && !user.bot) {
-                    counter = 0;
-                    stopped = true;
-                    collector.stop();
-                } else if(!user.bot) {
-                    console.log('usersWithCorrectAnswer')
-                    usersWithCorrectAnswer.push(user.username);
-                    console.log(usersWithCorrectAnswer)
-                    if (leaderboard[user.username] === undefined) {
-                        leaderboard[user.username] = 1;
-                    } else {
-                        leaderboard[user.username] += 1;
-                    }
+
+                console.log('usersWithCorrectAnswer')
+                usersWithCorrectAnswer.push(user.username);
+                console.log(usersWithCorrectAnswer)
+                if (leaderboard[user.username] === undefined) {
+                    leaderboard[user.username] = 1;
+                } else {
+                    leaderboard[user.username] += 1
                 }
             });
 
-
-            let newEmbed = new MessageEmbed(); // new embed instance
+            let newEmbed = new MessageEmbed();
             let result;
 
-            collector.on('end', collected => {
-                console.log(`Collected ${collected.size} interactions.`);
-            });
-
-             collector.on('end', async () => {
-                console.log('---')
-
-                console.log(usersWithCorrectAnswer)
-
+            collector.on('end', async () => {
                 if (usersWithCorrectAnswer.length === 0) {
                      result = newEmbed
                         .setTitle("Time's Up! No one got it....")
                         .setDescription('\n The correct answer was ' + (data.results[i].correct_answer))
-                        .setColor('#f40404');
-                     if (!stopped) {
-                        message.channel.send({ embeds: [result]});
-                    }
+                        .setColor('YELLOW');
+                         message.channel.send({ embeds: [result]});
+
                 } else {
                     result = newEmbed
                         .setTitle("That's IT! Here's who got it first:")
-                        .setDescription('\n The correct answer was ' + (data.results[i].correct_answer));
-
-                     // send the embed to the channel if the game wasn't terminated
-
-                     console.log(
-                         stopped
-                     )
-                    if (!stopped) {
+                        .setDescription(usersWithCorrectAnswer.join().replace(',', ', '))
+                        .setFooter('\n The correct answer was ' + data.results[i].correct_answer)
+                        .setColor('YELLOW');
                         message.channel.send({ embeds: [result]});
-                    }
+
                 }
-
             });
-
-
         }
     }
-
 });
 
 //----------------------------------------------------------------------------------------------------------------------
