@@ -5,8 +5,10 @@ const R = require('ramda')
 
 const BannedGames = [
     "fortnite",
-    "fallout"
-]
+    "fallout",
+    "fallout 4"
+];
+
 //const INTERVAL_CHECK_WARNING = 30 * 60 * 1000;
 //const INTERVAL_CHECK_BAN = 5 * 60 * 1000;
 const INTERVAL_CHECK_WARNING = 5 * 1000;
@@ -15,10 +17,22 @@ const INTERVAL_CHECK_BAN = 2 * 1000;
 const checkPlayedGameAtInterval = (client) => setInterval(() => checkOnlineUsersPlayedGame(client), INTERVAL_CHECK_WARNING);
 
 //----------------------------------------------------------------------------------------------------------------------
+
 const constructObjectMemberGamePlayed =  (member) => {
     return {'user': member, 'gamePlayed': member.presence?.activities
             .find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase()}
 }
+
+const getGameName = (member) => member.presence?.activities
+    .find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase();
+/*
+const constructObjectMemberGamePlayed = (member) => R.pipe(R.applySpec({
+    user: R.identity(member),
+    gamePlayed: getGameName2(member)
+}));
+
+
+ */
 const sendWarning = async (member) => member.user.guild.channels.cache.find(channel => channel.name === "general")
     .send(`${member.user} you are playing a forbidden game, stop if you don't want to get ban`);
 
@@ -77,9 +91,12 @@ const banWarnedMember = R.pipe(R.forEach(R.ifElse(
 //----------------------------------------------------------------------------------------------------------------------
 
 const checkIfStillPlayingGame = R.pipe(R.prop('user'), checkIfPlayingGame);
+/*
 const getGameName = (member) => member.user.presence?.activities
     .find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase();
-const checkIfPLayingSameBannedGame = (member) => R.equals(getGameName(member), R.prop('gamePlayed', member));
+
+ */
+const checkIfPLayingSameBannedGame = (member) => R.equals(getGameName(R.prop('user', member)), R.prop('gamePlayed', member));
 //const checkIfPLayingSameBannedGame = R.pipe(R.prop('user'), curriedCheckIfPlayingForbiddenGame);
 //const checkIfPLayingSameBannedGame = R.pipe(fn);
 const checkWarnedMember = R.pipe(
