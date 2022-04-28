@@ -5,36 +5,60 @@ const fetch = require('node-fetch');
 const wait = require('node:timers/promises').setTimeout
 
 async function test(robot, message) {
-    const response = await fetch('https://opentdb.com/api.php?amount=8&category=10&type=boolean');
-    const data = await response.json();
-
-    let length = data.results.length;
-
-    let randomNumber = Math.floor(Math.random() * length);
-    let randomQuestion = data.results[randomNumber];
-    let question = randomQuestion.question;
-    let correctAnswer = randomQuestion.correct_answer;
 
 
-    message.channel.send(question);
+    let quiz = [];
+    let filter = (msg) => !msg.author.bot;
 
+    const embed = new MessageEmbed() // on peut également definir le temps de reponse
+        .setTitle('Quiz generator')
+        .setColor('YELLOW')
+        .setDescription(
+            'Welcome to the !c command. To create your quiz you need to send ' +
+            'the text in a multiline format following the next pattern: ' +'\n'+
+            '\n' + 'Quiz topic' +
+            '\n' + 'Question?' +
+            '\n' + 'Correct answer' +
+            '\n' + 'Incorrect answers, separated by commas' +
+            '\n' + 'True or False, for add another question' +'\n'+
+            '\n' + 'Example:' +
+            '\n' + 'Programming'  +
+            '\n' + 'Which language is out of place?'  +
+            '\n' + 'HTML' +
+            '\n' + 'Java, C++, JavaScript' +
+            '\n' + 'True'
+        );
 
+    let add_question = true;
 
-    const filter = m => m.author.id === message.author.id;
-    const answer = await message.channel.awaitMessages(filter,
-        {maxMatches: 1, time: 10000,  errors: ['time', 'maxMatches']});
-    console.log(answer);
-
-    const ans = answer.first();
-
-
-    if(ans.content.toLowerCase() === correctAnswer.toLowerCase())
-    {
-        message.channel.send('You got the question right');
-    } else {
-        message.channel.send('That is incorrect');
+    while (add_question){
+        message.channel
+            .send({embeds: [embed]})
+            .then(() => {
+                return message.channel.send(`You can write your question ${quiz.length + 1}: `);
+            })
+            .then(() => {
+                return message.channel.awaitMessages({filter, time: 60000*2, max: 1});
+            })
+            .then((collected) => {
+                let message = collected.first().content;
+                let lines = message.trim().split('\n');
+                quiz.push({
+                    'topic': lines[0],
+                    'question': lines[1],
+                    'correct_answer': lines[2],
+                    'incorrect_answers': lines[3].split(',')
+                })
+                console.log(quiz);
+            });
     }
 
+    console.log(quiz);
+
+    while (add_question){
+        console.log('ok');
+        add_question = false;
+    }
 }
 
 async function quiz(robot, message) {
@@ -125,12 +149,12 @@ async function quiz(robot, message) {
 
 
 let commands_list = [{
-        name: 'test',
+        name: 't',
         out: test,
         about: 'test  command'
     },
     {
-        name: 'quiz',
+        name: 'q',
         out: quiz,
         about: 'quiz  command!'
     }

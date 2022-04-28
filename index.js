@@ -5,8 +5,6 @@ const  R  = require('ramda')
 const Discord = require("discord.js")
 const fs = require('node:fs');
 const fetch = require('node-fetch');
-const {MessageEmbed} = require("discord.js");
-
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
@@ -66,11 +64,7 @@ const commands = require("./events/commands.js");
 let config = require('./config.json');
 let prefix = config.prefix;
 
-
 client.on('message', (msg) => {
-
-
-    console.log(msg.channel.id);
 
     if (msg.author.username !== client.user.username && msg.author.discriminator !== client.user.discriminator) {
         let comm = msg.content.trim() + " ";
