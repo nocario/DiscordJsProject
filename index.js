@@ -68,6 +68,10 @@ let prefix = config.prefix;
 
 
 client.on('message', (msg) => {
+
+
+    console.log(msg.channel.id);
+
     if (msg.author.username !== client.user.username && msg.author.discriminator !== client.user.discriminator) {
         let comm = msg.content.trim() + " ";
         let comm_name = comm.slice(0, comm.indexOf(" "));
