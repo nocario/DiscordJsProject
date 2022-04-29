@@ -1,0 +1,20 @@
+[
+  {
+    "question": "Which language is out of place?",
+    "correct_answer": "HTML",
+    "incorrect_answers": [
+      "Java",
+      " C++",
+      " JavaScript"
+    ]
+  },
+  {
+    "question": "Who directed Yojimbo",
+    "correct_answer": "KUROSAWA",
+    "incorrect_answers": [
+      "Scorsese",
+      " Coppola",
+      " Hitchcock"
+    ]
+  }
+]
