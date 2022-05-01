@@ -1,4 +1,6 @@
 // Require the necessary discord.js classes
+
+console.log('start');
 const {Intents} = require('discord.js');
 const {token} = require('./config.json');
 const R = require('ramda');
@@ -26,17 +28,17 @@ const curriedCheckExecuteEvent = R.curry(checkExecuteEvent)(client);
 
 events(curriedCheckExecuteEvent, eventFiles);
 
-//----------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
 
 const {createQuiz} = require('./events/create-quiz.js');
 const {launchQuiz} = require('./events/launch-quiz.js');
 
-client.on('message', (message) => {
-    if (message.content.startsWith('-t') && !message.author.bot) {
-        console.log('-c');
+client.on('messageCreate',  (message) => {
+    if (message.content.startsWith('-c') && !message.author.bot) {
         createQuiz(client, message);
     }
-    else if (message.content.startsWith('-l') && !message.author.bot) {
+    if (message.content.startsWith('-l') && !message.author.bot) {
         console.log('-l');
         launchQuiz(client, message);
     }
