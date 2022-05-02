@@ -1,8 +1,5 @@
 const R = require('ramda')
 
-
-
-
 const BannedGames = [
     "fortnite",
     "fallout",
@@ -41,8 +38,6 @@ const checkIfPlayingGame = (member) => member.presence?.activities.find(activity
 const checkIfPlayingForbiddenGame = (bannedGames, member) => bannedGames.includes(member?.presence?.activities
     .find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase());
 const curriedCheckIfPlayingForbiddenGame = R.curry(checkIfPlayingForbiddenGame)(BannedGames);
-
-
 
 const checkIfMemberIsOnline = async (guild) => await guild.members.fetch({withPresences: true});
 const getOnlineMembers = R.pipe(R.map(checkIfMemberIsOnline));
