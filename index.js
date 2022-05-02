@@ -1,15 +1,17 @@
 // Require the necessary discord.js classes
-const { Intents} = require('discord.js');
-const { token} = require('./config.json');
-const  R  = require('ramda')
-const Discord = require("discord.js")
+
+console.log('start');
+const {Intents} = require('discord.js');
+const {token} = require('./config.json');
+const R = require('ramda');
+const Discord = require("discord.js");
 const fs = require('node:fs');
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
 const client = new Discord.Client({ intents:
         [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS]})
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS]});
 
 const executeEventOnce = R.invoker(2, "once");
 const executeEventOn = R.invoker(2, "on");
@@ -26,23 +28,19 @@ const curriedCheckExecuteEvent = R.curry(checkExecuteEvent)(client);
 
 events(curriedCheckExecuteEvent, eventFiles);
 
-//----------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 
-const commands = require("./events/commands.js");
-let config = require('./config.json');
-let prefix = config.prefix;
 
-client.on('message', (msg) => {
+const {createQuiz} = require('./events/create-quiz.js');
+const {launchQuiz} = require('./events/launch-quiz.js');
 
-    if (msg.author.username !== client.user.username && msg.author.discriminator !== client.user.discriminator) {
-        let comm = msg.content.trim() + " ";
-        let comm_name = comm.slice(0, comm.indexOf(" "));
-        for (comm_count in commands.comms) {
-            let comm2 = prefix + commands.comms[comm_count].name;
-            if (comm2 === comm_name) {
-                commands.comms[comm_count].out(client, msg);
-            }
-        }
+client.on('messageCreate',  (message) => {
+    if (message.content.startsWith('-c') && !message.author.bot) {
+        createQuiz(client, message);
+    }
+    if (message.content.startsWith('-l') && !message.author.bot) {
+        console.log('-l');
+        launchQuiz(client, message);
     }
 });
 
