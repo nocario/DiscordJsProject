@@ -6,10 +6,10 @@ const BannedGames = [
 	'fallout 4',
 ];
 
-// Const INTERVAL_CHECK_WARNING = 30 * 60 * 1000;
-// const INTERVAL_CHECK_BAN = 5 * 60 * 1000;
-const INTERVAL_CHECK_WARNING = 5 * 1000;
-const INTERVAL_CHECK_BAN = 2 * 1000;
+const INTERVAL_CHECK_WARNING = 20 * 60 * 1000;
+const INTERVAL_CHECK_BAN = 5 * 60 * 1000;
+//const INTERVAL_CHECK_WARNING = 5 * 1000;
+//const INTERVAL_CHECK_BAN = 2 * 1000;
 
 const checkPlayedGameAtInterval = client => setInterval(() => checkOnlineUsersPlayedGame(client), INTERVAL_CHECK_WARNING);
 
