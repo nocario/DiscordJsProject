@@ -4,7 +4,7 @@
   "description": "Bot for discord with discord.js, for Js class",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,15 +12,21 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
     "discord-api-types": "^0.31.2",
+    "eslint": "^8.14.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-promise": "^6.0.0",
     "gulp": "^4.0.2",
-    "ramda": "^0.28.0",
-    "xo": "^0.48.0"
+    "gulp-eslint": "^6.0.0",
+    "gulp-nodemon": "^2.5.0",
+    "ramda": "^0.28.0"
   },
   "dependencies": {
     "axios": "^0.27.1",
     "discord-quiz": "^1.0.4",
     "discord-reply": "^0.1.2",
     "discord.js": "^13.6.0",
-    "parse-entities": "^4.0.0"
+    "parse-entities": "^4.0.0",
+    "shuffle-array": "^1.0.1"
   }
 }

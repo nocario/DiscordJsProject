@@ -1,6 +1,5 @@
 const {MessageEmbed} = require('discord.js');
 const data = require('../quiz.json');
-const fs = require('node:fs');
 const R = require('ramda');
 const shuffle = require('shuffle-array');
 const wait = require('node:timers/promises').setTimeout;
@@ -8,68 +7,68 @@ const wait = require('node:timers/promises').setTimeout;
 
 const launchQuiz = async (robot, message)   => {
 
-    let dataSelected = data.find(el => el.quiz_name === 'antoine c:');
+	let dataSelected = data.find(el => el.quiz_name === 'antoine c:');
 
-    let results = dataSelected['results'];
-    let author = dataSelected['author'];
+	let results = dataSelected['results'];
+	let author = dataSelected['author'];
 
-    for (let i = 0; i < results.length; i++) {
+	for (let i = 0; i < results.length; i++) {
 
-        let correctAnswer = results[i].correct_answer;
-        let incorrectAnswers = results[i].incorrect_answers;
+		let correctAnswer = results[i].correct_answer;
+		let incorrectAnswers = results[i].incorrect_answers;
 
-        let choices = shuffle(R.concat(incorrectAnswers, [correctAnswer]));
+		let choices = shuffle(R.concat(incorrectAnswers, [correctAnswer]));
 
-        console.log(choices);
-        console.log(correctAnswer);
+		console.log(choices);
+		console.log(correctAnswer);
 
 
-       // let result;
-        let usersWithCorrectAnswer = [];
-        let newEmbed = new MessageEmbed();
+		// let result;
+		let usersWithCorrectAnswer = [];
+		let newEmbed = new MessageEmbed();
 
-        const embed = new MessageEmbed()
-            .setTitle('✨' + results[i].question + '✨')
-            .setColor('YELLOW')
-            .setDescription('\n' +
+		const embed = new MessageEmbed()
+			.setTitle('✨' + results[i].question + '✨')
+			.setColor('YELLOW')
+			.setDescription('\n' +
                 '\n💛 ' + (choices[0]) + '\n' +
                 '\n💚 ' + (choices[1]) + '\n' +
                 '\n💙 ' + (choices[2]) + '\n' +
                 '\n💜 ' + (choices[3]) + '\n'
-            );
+			);
 
-        let reactions = ['💛', '💚', '💙', '💜'];
-        //let msgEmbed = await message.channel.send({embeds: [embed]});
+		let reactions = ['💛', '💚', '💙', '💜'];
+		//let msgEmbed = await message.channel.send({embeds: [embed]});
 
-        //reactions.forEach((reaction) => msgEmbed.react(reaction));
+		//reactions.forEach((reaction) => msgEmbed.react(reaction));
 
-        //let answer = '';
+		//let answer = '';
 
-        let index = R.indexOf(correctAnswer);
-        let answer = R.nth(index);
-        let result = R.map(index, answer);
-        console.log(result);
-
-
-        let t = R.pipe(
-            R.map(R.nth(R.indexOf)),
-            R.join(''));
+		let index = R.indexOf(correctAnswer);
+		let answer = R.nth(index);
+		let result = R.map(index, answer);
+		console.log(result);
 
 
-        console.log(t(correctAnswer));
+		let t = R.pipe(
+			R.map(R.nth(R.indexOf)),
+			R.join(''));
 
 
-        if (correctAnswer === choices[0]) { // TODO : improve method
-            answer = '💛';
-        } else if (correctAnswer === choices[1]) {
-            answer = '💚';
-        } else if (correctAnswer === choices[2]) {
-            answer = '💙';
-        } else {
-            answer = '💜';
-        }
+		console.log(t(correctAnswer));
 
-        /*
+
+		if (correctAnswer === choices[0]) { // TODO : improve method
+			answer = '💛';
+		} else if (correctAnswer === choices[1]) {
+			answer = '💚';
+		} else if (correctAnswer === choices[2]) {
+			answer = '💙';
+		} else {
+			answer = '💜';
+		}
+
+		/*
            const filter = (reaction, user) => {
                return (reaction.emoji.name === answer) && !user.bot;
            };
@@ -99,8 +98,8 @@ const launchQuiz = async (robot, message)   => {
                }
                message.channel.send({embeds: [result]});
            }); */
-        await wait(15000);
-    }
-}
+		await wait(15000);
+	}
+};
 
 module.exports = {launchQuiz};
