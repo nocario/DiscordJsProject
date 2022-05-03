@@ -21,6 +21,7 @@
     "discord-quiz": "^1.0.4",
     "discord-reply": "^0.1.2",
     "discord.js": "^13.6.0",
-    "parse-entities": "^4.0.0"
+    "parse-entities": "^4.0.0",
+    "shuffle-array": "^1.0.1"
   }
 }

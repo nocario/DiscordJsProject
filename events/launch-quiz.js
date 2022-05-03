@@ -6,101 +6,92 @@ const shuffle = require('shuffle-array');
 const wait = require('node:timers/promises').setTimeout;
 
 
+const QUESTION_INTERVAL = 15000;
+const TIME_MAX = 10000;
+const reactions = ['💛', '💚', '💙', '💜'];
+
+
+
 const launchQuiz = async (robot, message)   => {
 
-    let dataSelected = data.find(el => el.quiz_name === 'antoine c:');
+    let dataSelected = data.find(el => el.quiz_name === 'test');
 
-    let results = dataSelected['results'];
-    let author = dataSelected['author'];
+    let results = R.prop('results', dataSelected);
 
-    for (let i = 0; i < results.length; i++) {
+    const main = async (results) => {
 
-        let correctAnswer = results[i].correct_answer;
-        let incorrectAnswers = results[i].incorrect_answers;
+        let usersWithCorrectAnswer = [];
+
+        let correctAnswer = R.prop('correct_answer', results);
+        let incorrectAnswers = R.prop('incorrect_answers', results);
 
         let choices = shuffle(R.concat(incorrectAnswers, [correctAnswer]));
 
-        console.log(choices);
-        console.log(correctAnswer);
+        let messageEmbed = await createQuestionEmbed(
+            createQuestionDescription(choices, reactions,[]))
+            (R.prop('question', results), message);
 
+        const collector = getCollector(messageEmbed)(getFilter(
+            getCorrectAnswer(correctAnswer, choices)(reactions))
+        );
 
-       // let result;
-        let usersWithCorrectAnswer = [];
-        let newEmbed = new MessageEmbed();
-
-        const embed = new MessageEmbed()
-            .setTitle('✨' + results[i].question + '✨')
-            .setColor('YELLOW')
-            .setDescription('\n' +
-                '\n💛 ' + (choices[0]) + '\n' +
-                '\n💚 ' + (choices[1]) + '\n' +
-                '\n💙 ' + (choices[2]) + '\n' +
-                '\n💜 ' + (choices[3]) + '\n'
-            );
-
-        let reactions = ['💛', '💚', '💙', '💜'];
-        //let msgEmbed = await message.channel.send({embeds: [embed]});
-
-        //reactions.forEach((reaction) => msgEmbed.react(reaction));
-
-        //let answer = '';
-
-        let index = R.indexOf(correctAnswer);
-        let answer = R.nth(index);
-        let result = R.map(index, answer);
-        console.log(result);
-
-
-        let t = R.pipe(
-            R.map(R.nth(R.indexOf)),
-            R.join(''));
-
-
-        console.log(t(correctAnswer));
-
-
-        if (correctAnswer === choices[0]) { // TODO : improve method
-            answer = '💛';
-        } else if (correctAnswer === choices[1]) {
-            answer = '💚';
-        } else if (correctAnswer === choices[2]) {
-            answer = '💙';
-        } else {
-            answer = '💜';
-        }
-
-        /*
-           const filter = (reaction, user) => {
-               return (reaction.emoji.name === answer) && !user.bot;
-           };
-
-           const collector = msgEmbed.createReactionCollector({filter, time: 15000});
-
-
-           collector.on('collect', (reaction, user) => {
-               usersWithCorrectAnswer.push(user.username);
-               console.log(usersWithCorrectAnswer);
-           })
-
-
-
-           collector.on('end', async () => {
-               if (usersWithCorrectAnswer.length === 0) {
-                   result = newEmbed
-                       .setTitle("Time's Up! No one got it.... 🦉")
-                       .setDescription('\n The correct answer was ' + correctAnswer)
-                       .setColor('YELLOW');
-               } else {
-                   result = newEmbed
-                       .setTitle("Great! Here's who got it first 🍒:")
-                       .setDescription(usersWithCorrectAnswer.join().replace(',', ', '))
-                       .setFooter('\n The correct answer was ' + correctAnswer)
-                       .setColor('YELLOW');
-               }
-               message.channel.send({embeds: [result]});
-           }); */
-        await wait(15000);
+        R.pipe(
+            addReactions(messageEmbed, reactions),
+            collectorOn(collector, usersWithCorrectAnswer),
+            collectorEnd(collector, usersWithCorrectAnswer, correctAnswer, message),
+            await wait(QUESTION_INTERVAL)
+        );
     }
+
+    R.forEach(main, results);
+
 }
 
+const createEmbed_ = (title, description) => {
+    return new MessageEmbed()
+        .setTitle(title)
+        .setColor('YELLOW')
+        .setDescription(description);
+};
+
+
+const createReactions = (embed, reactions) => R.forEach((reaction) => { embed.react(reaction); }, reactions);
+
+const addReactions = (embed) => createReactions(embed, reactions);
+
+const getCorrectAnswer = (correctAnswer, choices) => R.nth(R.indexOf(correctAnswer, choices));
+
+const createQuestionDescription = (options, reactions, list) => {
+    options.forEach((option, index) => { list.push(`\n${R.nth(index, reactions)} ${option}\n`)});
+    return R.join(' ', list);
+}
+const createQuestionEmbed = (description) => (question, message) => {
+    let embed = createEmbed_(`\n✨ ${question} ✨ \n`, description);
+    return message.channel.send({embeds: [embed]})
+}
+
+const getFilter = (answer) => (reaction, user) => { return (reaction.emoji.name === answer) && !user.bot;};
+
+const getCollector = (embed) => (filter) => { return embed.createReactionCollector({filter, time: TIME_MAX});}
+
+
+// getCollector(messageEmbed, getFilter(correctAnswerEmoji))
+
+const collectorOn = (collector, list) => collector.on('collect', (reaction, user) => { list.push(user.username);})
+//R.append(user.username, usersWithCorrectAnswer) => doesnt work, check later why
+
+
+
+const collectorEnd = (collector, list, answer, message) => collector.on('end', async () => {
+    const result = R.ifElse(
+        R.isEmpty,
+        R.always(createEmbed_('Time\'s Up! No one got it.... 🦉', `\n The correct answer was ${answer}`)),
+        R.always(createEmbed_('Great! Here\'s who got it first 🍒:',
+            `${R.join(', ', list)} \n The correct answer was ${answer}`
+        ))
+    );
+    message.channel.send({embeds: [result(list)]});
+});
+
 module.exports = {launchQuiz};
+

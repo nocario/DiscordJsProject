@@ -1,6 +1,4 @@
 // Require the necessary discord.js classes
-
-console.log('start');
 const {Intents} = require('discord.js');
 const {token} = require('./config.json');
 const R = require('ramda');
@@ -30,7 +28,6 @@ events(curriedCheckExecuteEvent, eventFiles);
 
 //---------------------------------------------------------------------------------------------------------------------
 
-
 const {createQuiz} = require('./events/create-quiz.js');
 const {launchQuiz} = require('./events/launch-quiz.js');
 
@@ -43,8 +40,16 @@ client.on('messageCreate',  (message) => {
         launchQuiz(client, message);
     }
 });
+const data = require('./quiz.json');
+
+let dataSelected = data.find(el => el.quiz_name === 'test');
+
+let results = R.prop('results', dataSelected);
+
+const printXPlusFive = x => console.log(R.prop('question',x) );
+R.forEach(printXPlusFive, results);
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
-
 client.login(token).then()
-

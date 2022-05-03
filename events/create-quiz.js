@@ -30,16 +30,13 @@ const createQuiz = async (robot, message)  => {
     const collector = await message.channel.createMessageCollector( {filter});
 
     for await (const msg of collector) {
-        if (msg.content === '-stop') {
+        if (R.equals('-stop', msg.content)) {
             message.reply('To finalize, please send -stop + the name for your quiz:');
             collector.stop();
         }
-        if (msg.content.includes('-stop')) {
+        if (R.includes('-stop', msg.content)) {
             let line = R.map(R.trim, R.split(' ', msg.content));
-
-            let result = R.pipe(
-                R.drop(1),
-                R.join(' '));
+            let result = R.pipe(R.drop(1), R.join(' '));
 
             quiz_name = result(line);
             author_name = msg.author;
@@ -57,6 +54,8 @@ const createQuiz = async (robot, message)  => {
             message.reply(`Question n°${results.length} added. Write another one or stop with -stop.`);
         }
     }
+
+    console.log(quiz_name);
 
     const quiz = R.zipObj(['quiz_name', 'author', 'results'], [quiz_name, [author_name], results]);
 
