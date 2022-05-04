@@ -1,6 +1,4 @@
 // Require the necessary discord.js classes
-
-console.log('start');
 const {Intents} = require('discord.js');
 const {token} = require('./config.json');
 const R = require('ramda');
@@ -34,6 +32,12 @@ events(curriedCheckExecuteEvent, eventFiles);
 
 const {createQuiz} = require('./events/create-quiz.js');
 const {launchQuiz} = require('./events/launch-quiz.js');
+
+client.on('interactionCreate', interaction => {
+	console.log(interaction);
+});
+
+
 
 client.on('messageCreate',  (message) => {
 	if (message.content.startsWith('-c') && !message.author.bot) {
