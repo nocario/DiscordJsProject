@@ -2,13 +2,56 @@ const {MessageEmbed} = require('discord.js');
 const fs = require('node:fs');
 const R = require('ramda');
 
+
+let results = [];
+
 const createQuiz = async (robot, message)  => {
 
-    let quiz_name;
-    let author_name;
-    let results = [];
+    const quiz_name = (input) => {
+        console.log(input);
+        return R.trim(R.replace('-stop', ' ', input));}
 
-    const embed = new MessageEmbed() // on peut également definir le temps de reponse
+
+    message.channel.send({embeds: [createEmbed_()]});
+
+    const filter = (user) => { return !user.bot;};
+    const collector = await message.channel.createMessageCollector( {filter});
+
+
+    for await (const msg of collector) {
+        const m = msg.content;
+        const n = numberOfLines(m);
+
+        R.cond([
+            [R.includes('-stop'), msg => quiz_name(msg), collector.stop()],
+            [R.equals('-stop'), message.reply('To finalize, please send -stop following with the name for your quiz:')],
+            [R.T, msg => addQuestion(msg),
+                message.reply(`Question n°${results.length} added. Write another one or stop with -stop.`)]
+        ])(m);
+    }
+
+
+    const quiz = R.zipObj(['quiz_name', 'results'], [quiz_name, results]);
+
+
+    fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
+        function(err, result) {
+        if(err) console.log('error', err);
+    });
+}
+
+const lines = (input) => R.map(R.trim, R.split('\n',input));
+
+const numberOfLines = (lines) => [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);
+
+const addQuestion = (input) => {const result = R.map(
+    R.assoc('incorrect_answers', R.split(',', R.last(lines(input)))),
+    R.zipObj(['question', 'correct_answer', 'incorrect_answers']));
+    results.push(result(lines(input)));
+}
+
+const createEmbed_ = () => {
+    return new MessageEmbed()
         .setTitle('✨Quiz Generator✨')
         .setColor('YELLOW')
         .setFooter({text : 'To stop, use the command -stop.'})
@@ -23,47 +66,6 @@ const createQuiz = async (robot, message)  => {
             '\n' + 'HTML' +
             '\n' + 'Java, C++, JavaScript'
         );
-
-    message.channel.send({embeds: [embed]});
-
-    const filter = message => !message.author.bot;
-    const collector = await message.channel.createMessageCollector( {filter});
-
-    for await (const msg of collector) {
-        if (R.equals('-stop', msg.content)) {
-            message.reply('To finalize, please send -stop + the name for your quiz:');
-            collector.stop();
-        }
-        if (R.includes('-stop', msg.content)) {
-            let line = R.map(R.trim, R.split(' ', msg.content));
-            let result = R.pipe(R.drop(1), R.join(' '));
-
-            quiz_name = result(line);
-            author_name = msg.author;
-
-            collector.stop();
-        }
-        else {
-            const lines = R.map(R.trim, R.split('\n', msg.content));
-            const result = R.map(
-                R.assoc('incorrect_answers', R.split(',', R.last(lines))),
-                R.zipObj(['question', 'correct_answer', 'incorrect_answers']));
-
-            results.push(result(lines));
-
-            message.reply(`Question n°${results.length} added. Write another one or stop with -stop.`);
-        }
-    }
-
-    console.log(quiz_name);
-
-    const quiz = R.zipObj(['quiz_name', 'author', 'results'], [quiz_name, [author_name], results]);
-
-
-    fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
-        function(err, result) {
-        if(err) console.log('error', err);
-    });
 }
 
 module.exports = {createQuiz};
