@@ -33,22 +33,14 @@ events(curriedCheckExecuteEvent, eventFiles);
 const {createQuiz} = require('./events/create-quiz.js');
 const {launchQuiz} = require('./events/launch-quiz.js');
 
-client.on('interactionCreate', interaction => {
-	console.log(interaction);
-});
-
-
-
 client.on('messageCreate',  (message) => {
 	if (message.content.startsWith('-c') && !message.author.bot) {
 		createQuiz(client, message);
 	}
 	if (message.content.startsWith('-l') && !message.author.bot) {
-		console.log('-l');
 		launchQuiz(client, message);
 	}
 });
-
 
 //----------------------------------------------------------------------------------------------------------------------
 client.login(token).then();
