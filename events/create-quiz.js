@@ -3,51 +3,59 @@ const fs = require('node:fs');
 const R = require('ramda');
 
 
+let MATCHER = /^([^\n]+)([^,]+,[^,]+,[^,\n]{2})(\n){0}/g
+
 let results = [];
 
 const createQuiz = async (robot, message)  => {
 
-    const quiz_name = (input) => {
-        console.log(input);
-        return R.trim(R.replace('-stop', ' ', input));}
-
-
     message.channel.send({embeds: [createEmbed_()]});
 
-    const filter = (user) => { return !user.bot;};
+    const filter = message => R.lt(numberOfLines(message.content), 3) && !message.author.bot;
+
     const collector = await message.channel.createMessageCollector( {filter});
 
-
     for await (const msg of collector) {
-        const m = msg.content;
-        const n = numberOfLines(m);
-
         R.cond([
-            [R.includes('-stop'), msg => quiz_name(msg), collector.stop()],
-            [R.equals('-stop'), message.reply('To finalize, please send -stop following with the name for your quiz:')],
-            [R.T, msg => addQuestion(msg),
-                message.reply(`Question n°${results.length} added. Write another one or stop with -stop.`)]
-        ])(m);
+            [R.equals('-end'), () => message.reply('To finalize, please send -name following the name for your quiz:')],
+            [R.includes('-name'), (input) => quiz(input, collector)],
+            [R.test(MATCHER), (input) => addQuestion(input)],
+            [R.T, () => message.reply('There is something wrong... (°.°)')],
+        ])(msg.content);
+        message.reply(`Question n°${results.length + 1} added, write another one or stop with -stop.`);
     }
+}
 
 
-    const quiz = R.zipObj(['quiz_name', 'results'], [quiz_name, results]);
-
-
+const createJson = (quiz) => {
     fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
         function(err, result) {
-        if(err) console.log('error', err);
+            if(err) console.log('error', err);
+            else console.log('Quiz saved! :)')
     });
 }
 
-const lines = (input) => R.map(R.trim, R.split('\n',input));
+const quiz = (input, collector) => {
+    createJson(R.zipObj(
+        ['quiz_name', 'results'],
+        [R.trim(R.replace('-name', ' ', input)), results])
+    );
+    collector.stop();
+}
 
-const numberOfLines = (lines) => [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);
+const addQuestion = (input) => {
+    results.push(question(R.map(R.trim, R.split('\n', input))));
+}
 
-const addQuestion = (input) => {const result = R.map(
-    R.assoc('incorrect_answers', R.split(',', R.last(lines(input)))),
-    R.zipObj(['question', 'correct_answer', 'incorrect_answers']));
-    results.push(result(lines(input)));
+const numberOfLines = (lines) => { return [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);}
+
+const lines = (input) => R.map(R.trim, R.split('\n', input));
+
+const question = (lines) => {
+    return R.map(
+        R.assoc('incorrect_answers',  R.split(',', R.last(lines))),
+        R.zipObj(['question', 'correct_answer', 'incorrect_answers']))(lines);
+    //return result(lines);
 }
 
 const createEmbed_ = () => {
