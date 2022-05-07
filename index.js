@@ -44,7 +44,14 @@ client.on('messageCreate',  (message) => {
 
 
 
-//----------------------------------------------------------------------------------------------------------------------
+
+client.on('interactionCreate', interaction =>{
+	R.cond([
+		[R.equals('create'), () => createQuiz(client, interaction)],
+		[R.equals('start'), (input) => launchQuiz(client, interaction)],
+	])(interaction.commandName);
+});
+
 
 
 

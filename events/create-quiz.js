@@ -1,53 +1,63 @@
 const {MessageEmbed} = require('discord.js');
 const fs = require('node:fs');
 const R = require('ramda');
-
-
-let MATCHER = /^([^\n]+)([^,]+,[^,]+,[^,\n]{2})(\n){0}/g
-
+const {Command} = require('commander');
+const program = new Command();
+//----------------------------------------------------------------------------------------------------------------------
+const MATCHER = /^([^\n]+)([^,]+,[^,]+,[^,\n]{2})(\n){0}/g;
 let results = [];
+//----------------------------------------------------------------------------------------------------------------------
 
-const createQuiz = async (robot, message)  => {
+const createQuiz = async (client, interaction)  => {
 
-    message.channel.send({embeds: [createEmbed_()]});
+    console.log(interaction.options);
 
-    const filter = message => R.lt(numberOfLines(message.content), 3) && !message.author.bot;
+    const filter = interaction => R.lt(numberOfLines(interaction.content), 3) && !interaction.author.bot;
 
-    const collector = await message.channel.createMessageCollector( {filter});
+    const collector = await interaction.channel.createMessageCollector({filter});
 
+    const sendMessage = (output) => interaction.channel.send(output);
+   // message.channel.send({embeds: [createEmbed_()]});
+          //sendMessage({embeds: [createEmbed_()]}),
+       // collectMessages(collector)
+
+    R.pipe(
+        interaction.channel.send({embeds: [createEmbed_()]}),
+        await collectMessages(collector, interaction)
+    );
+    /*
+    if (interaction.options.getSubcommand() === 'start') {
+        const question = interaction.options.getString('question');
+        const answer = interaction.options.getString('answer');
+        const optionFirst = interaction.options.getString('option1');
+        const optionSecond = interaction.options.getString('option2');
+        const optionThird = interaction.options.getString('option3');
+
+        console.log('ok');
+
+        console.log(question);
+
+
+        await interaction.channel.send(`question: ${question}`);
+        await interaction.channel.send(`answer: ${answer}`);
+        await interaction.channel.send(`option 1: ${optionFirst}`);
+        await interaction.channel.send(`option 2: ${optionSecond}`);
+        await interaction.channel.send(`option 3: ${optionThird}`);
+    }
+    */
+
+}
+
+const collectMessages = async (collector, interaction) => {
     for await (const msg of collector) {
         R.cond([
-            [R.equals('-end'), () => message.reply('To finalize, please send -name following the name for your quiz:')],
+            [R.equals('-end'), () => interaction.channel.send('To finalize, please send -name following the name for your quiz:')],
             [R.includes('-name'), (input) => quiz(input, collector)],
-            [R.test(MATCHER), (input) => addQuestion(input)],
-            [R.T, () => message.reply('There is something wrong... (°.°)')],
+            [R.test(MATCHER), (input) => addQuestion(input, interaction)],
+            [R.T, () => interaction.channel.send('There is something wrong... (°.°)')],
         ])(msg.content);
-        message.reply(`Question n°${results.length + 1} added, write another one or stop with -stop.`);
     }
 }
-
-
-const createJson = (quiz) => {
-    fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
-        function(err, result) {
-            if(err) console.log('error', err);
-            else console.log('Quiz saved! :)')
-    });
-}
-
-const quiz = (input, collector) => {
-    createJson(R.zipObj(
-        ['quiz_name', 'results'],
-        [R.trim(R.replace('-name', ' ', input)), results])
-    );
-    collector.stop();
-}
-
-const addQuestion = (input) => {
-    results.push(question(R.map(R.trim, R.split('\n', input))));
-}
-
-const numberOfLines = (lines) => { return [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);}
 
 const lines = (input) => R.map(R.trim, R.split('\n', input));
 
@@ -55,7 +65,26 @@ const question = (lines) => {
     return R.map(
         R.assoc('incorrect_answers',  R.split(',', R.last(lines))),
         R.zipObj(['question', 'correct_answer', 'incorrect_answers']))(lines);
-    //return result(lines);
+}
+
+const numberOfLines = (lines) => { return [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);}
+
+const addQuestion = (input, interaction) => {
+    results.push(question(lines(input)));
+    interaction.channel.send(`Question n°${R.add(results.length)} added, write another one or stop with -end.`);
+}
+
+const quiz = (input, collector) => {
+    createJson(R.zipObj(['quiz_name', 'results'], [R.trim(R.replace('-name', ' ', input)), results]));
+    collector.stop();
+}
+
+const createJson = (quiz) => {
+    fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
+        function(err) {
+            if(err) console.log('error', err);
+            else console.log('Quiz saved! :)')
+    });
 }
 
 const createEmbed_ = () => {
