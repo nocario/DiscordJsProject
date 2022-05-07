@@ -10,7 +10,7 @@ let results = [];
 
 const createQuiz = async (client, interaction)  => {
 
-    console.log(interaction.options);
+    console.log(interaction);
 
     const filter = interaction => R.lt(numberOfLines(interaction.content), 3) && !interaction.author.bot;
 
@@ -21,11 +21,10 @@ const createQuiz = async (client, interaction)  => {
           //sendMessage({embeds: [createEmbed_()]}),
        // collectMessages(collector)
 
-    R.pipe(
-        interaction.channel.send({embeds: [createEmbed_()]}),
-        await collectMessages(collector, interaction)
-    );
-    /*
+
+    //await interaction.editReply({embeds: [createEmbed_()]});
+    //await collectMessages(collector, interaction);
+
     if (interaction.options.getSubcommand() === 'start') {
         const question = interaction.options.getString('question');
         const answer = interaction.options.getString('answer');
@@ -33,6 +32,7 @@ const createQuiz = async (client, interaction)  => {
         const optionSecond = interaction.options.getString('option2');
         const optionThird = interaction.options.getString('option3');
 
+        const
         console.log('ok');
 
         console.log(question);
@@ -44,18 +44,19 @@ const createQuiz = async (client, interaction)  => {
         await interaction.channel.send(`option 2: ${optionSecond}`);
         await interaction.channel.send(`option 3: ${optionThird}`);
     }
-    */
 
 }
 
 const collectMessages = async (collector, interaction) => {
-    for await (const msg of collector) {
+    for await (const message of collector) {
+        console.log(message.content);
+
         R.cond([
-            [R.equals('-end'), () => interaction.channel.send('To finalize, please send -name following the name for your quiz:')],
-            [R.includes('-name'), (input) => quiz(input, collector)],
-            [R.test(MATCHER), (input) => addQuestion(input, interaction)],
-            [R.T, () => interaction.channel.send('There is something wrong... (°.°)')],
-        ])(msg.content);
+            [R.equals('-end'), () => message.channel.send('To finalize, please send -name following the name for your quiz:')],
+            [R.includes('-name'), (input) => quiz(input, collector, interaction)],
+            [R.test(MATCHER), (input) => addQuestion(input, message)],
+            [R.T, () => message.channel.send('There is something wrong... (°.°)')],
+        ])(message.content);
     }
 }
 
@@ -69,22 +70,24 @@ const question = (lines) => {
 
 const numberOfLines = (lines) => { return [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);}
 
-const addQuestion = (input, interaction) => {
+const addQuestion = (input, message) => {
     results.push(question(lines(input)));
-    interaction.channel.send(`Question n°${R.add(results.length)} added, write another one or stop with -end.`);
+    message.channel.send(`Question n°${results.length} added, write another one or stop with -end.`);
 }
 
-const quiz = (input, collector) => {
-    createJson(R.zipObj(['quiz_name', 'results'], [R.trim(R.replace('-name', ' ', input)), results]));
+const quiz = (input, collector, interaction) => {
+    const quiz = R.zipObj(['quiz_name', 'results'], [R.trim(R.replace('-name', ' ', input)), results]);
+    createJson(quiz, interaction);
     collector.stop();
 }
 
-const createJson = (quiz) => {
+const createJson = (quiz, interaction) => {
     fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
-        function(err) {
-            if(err) console.log('error', err);
-            else console.log('Quiz saved! :)')
-    });
+        async function (err) {
+            if (err) console.log('error', err);
+            else await interaction.followUp('quiz saved!')
+
+        });
 }
 
 const createEmbed_ = () => {
