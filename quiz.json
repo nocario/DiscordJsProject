@@ -1,39 +1,14 @@
 [
   {
-    "quiz_name": "antoine c:",
-    "author": [
-      {
-        "id": "557309631127617556",
-        "bot": false,
-        "system": false,
-        "flags": 0,
-        "username": "taredalen",
-        "discriminator": "9919",
-        "avatar": "c49084888837c7e87d14adb9b6476287",
-        "createdTimestamp": 1552943370373,
-        "defaultAvatarURL": "https://cdn.discordapp.com/embed/avatars/4.png",
-        "tag": "taredalen#9919",
-        "avatarURL": "https://cdn.discordapp.com/avatars/557309631127617556/c49084888837c7e87d14adb9b6476287.webp",
-        "displayAvatarURL": "https://cdn.discordapp.com/avatars/557309631127617556/c49084888837c7e87d14adb9b6476287.webp"
-      }
-    ],
+    "quiz_name": "so this is permanence",
     "results": [
       {
-        "question": "Who directed Yojimbo",
-        "correct_answer": "KUROSAWA",
+        "question": "which track is not included in the album closer by JD?",
+        "correct_answer": "centuries",
         "incorrect_answers": [
-          "Scorsese",
-          " Coppola",
-          " Hitchcock"
-        ]
-      },
-      {
-        "question": "Who is the first Roman emperor",
-        "correct_answer": "Augustus",
-        "incorrect_answers": [
-          "Caesar",
-          " Sulla",
-          " Tiberius"
+          "twenty four hours",
+          "the eternal",
+          "decades"
         ]
       }
     ]

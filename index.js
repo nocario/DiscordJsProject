@@ -28,38 +28,6 @@ const checkExecuteEvent = (client, file) => {
 const curriedCheckExecuteEvent = R.curry(checkExecuteEvent)(client);
 events(curriedCheckExecuteEvent, eventFiles);
 
-//---------------------------------------------------------------------------------------------------------------------
-
-const {createQuiz} = require('./events/create-quiz.js');
-//const {launchQuiz} = require('./events/launch-quiz.js');
-
-const wait = require('node:timers/promises').setTimeout;
-
-client.on('interactionCreate', async interaction =>{
-	await interaction.deferReply();
-	await wait(1000);
-
-	R.cond([
-		[R.equals('quiz'), async () => await createQuiz(client, interaction)],
-		//[R.equals('start'), (input) => launchQuiz(client, interaction)],
-	])(interaction.commandName);
-});
-
-
-
-
-/*
-const wait = require('node:timers/promises').setTimeout;
-
-
-
-client.on('interactionCreate', async interaction =>{
-
-if (interaction.commandName === 'quiz') {
-	await createQuiz(client, interaction)
-}
-}); */
-
 //----------------------------------------------------------------------------------------------------------------------
 client.login(token).then();
 

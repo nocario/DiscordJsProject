@@ -1,12 +1,10 @@
 const {MessageEmbed} = require('discord.js');
 const fs = require('node:fs');
 const R = require('ramda');
-const wait = require('node:timers/promises').setTimeout;
-
 //----------------------------------------------------------------------------------------------------------------------
 let results = [];
 
-const createQuiz = async (client, interaction)  => {
+const createQuiz = async (interaction)  => {
 
     const getString = (name) => interaction.options.getString(name);
 
