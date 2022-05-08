@@ -1,111 +1,66 @@
 const {MessageEmbed} = require('discord.js');
 const fs = require('node:fs');
 const R = require('ramda');
-const {Command} = require('commander');
-const program = new Command();
+const wait = require('node:timers/promises').setTimeout;
+
 //----------------------------------------------------------------------------------------------------------------------
-const MATCHER = /^([^\n]+)([^,]+,[^,]+,[^,\n]{2})(\n){0}/g;
 let results = [];
-//----------------------------------------------------------------------------------------------------------------------
 
 const createQuiz = async (client, interaction)  => {
 
-    console.log(interaction);
+    const getString = (name) => interaction.options.getString(name);
 
-    const filter = interaction => R.lt(numberOfLines(interaction.content), 3) && !interaction.author.bot;
+    const quiz = () => { return R.zipObj(['quiz_name', 'results'], [getString('name'), results]);}
 
-    const collector = await interaction.channel.createMessageCollector({filter});
+    const question = () => {
+        return  zipQuestion(getString('question'), getString('answer'),
+        [getString('option1'), getString('option2'), getString('option3')])}
 
-    const sendMessage = (output) => interaction.channel.send(output);
-   // message.channel.send({embeds: [createEmbed_()]});
-          //sendMessage({embeds: [createEmbed_()]}),
-       // collectMessages(collector)
-
-
-    //await interaction.editReply({embeds: [createEmbed_()]});
-    //await collectMessages(collector, interaction);
-
-    if (interaction.options.getSubcommand() === 'start') {
-        const question = interaction.options.getString('question');
-        const answer = interaction.options.getString('answer');
-        const optionFirst = interaction.options.getString('option1');
-        const optionSecond = interaction.options.getString('option2');
-        const optionThird = interaction.options.getString('option3');
-
-        const
-        console.log('ok');
-
-        console.log(question);
-
-
-        await interaction.channel.send(`question: ${question}`);
-        await interaction.channel.send(`answer: ${answer}`);
-        await interaction.channel.send(`option 1: ${optionFirst}`);
-        await interaction.channel.send(`option 2: ${optionSecond}`);
-        await interaction.channel.send(`option 3: ${optionThird}`);
-    }
-
+    R.cond([
+        [R.equals('help'), async () => await quizHelp(interaction)],
+        [R.equals('add'), async () => await quizAdd(interaction, question())],
+        [R.equals('save'), async () => await quizSave(interaction, quiz())],
+    ])(interaction.options.getSubcommand());
 }
 
-const collectMessages = async (collector, interaction) => {
-    for await (const message of collector) {
-        console.log(message.content);
+//----------------------------------------------------------------------------------------------------------------------
 
-        R.cond([
-            [R.equals('-end'), () => message.channel.send('To finalize, please send -name following the name for your quiz:')],
-            [R.includes('-name'), (input) => quiz(input, collector, interaction)],
-            [R.test(MATCHER), (input) => addQuestion(input, message)],
-            [R.T, () => message.channel.send('There is something wrong... (°.°)')],
-        ])(message.content);
-    }
+const zipQuestion = (question, answer, options) => {
+    return R.zipObj(['question', 'correct_answer', 'incorrect_answers'], [question, answer, options]);
 }
 
-const lines = (input) => R.map(R.trim, R.split('\n', input));
-
-const question = (lines) => {
-    return R.map(
-        R.assoc('incorrect_answers',  R.split(',', R.last(lines))),
-        R.zipObj(['question', 'correct_answer', 'incorrect_answers']))(lines);
+const quizAdd = async (interaction, question) => {
+    results.push(question);
+    await interaction.followUp({embeds: [createEmbed_(`✨Question n°${results.length} added✨`,
+            ' Write another one or end with -save.')]});
 }
 
-const numberOfLines = (lines) => { return [...lines].reduce((a, c) => a + (c === '\n' ? 1 : 0), 0);}
-
-const addQuestion = (input, message) => {
-    results.push(question(lines(input)));
-    message.channel.send(`Question n°${results.length} added, write another one or stop with -end.`);
+const quizHelp = async (interaction) => {
+    await interaction.followUp({embeds: [
+    createEmbed_('✨ Quiz Generator ✨',
+        'Welcome to the ****/quiz**** command. To create your quiz you need to use ' +
+        'the following subcommands:\n \n /quiz ****add****\n \n Use this command to add a ' +
+        'question to your quiz which is created automatically with the addition of the first ' +
+        'question.\n Question, correct answer and following options (3 max) are required.\n \n' +
+        '\n /quiz ****save****\n \n To avoid wasting time and effort, use this command to save ' +
+        'the quiz. \nThe name for your quiz will be requested.')
+    ]});
 }
 
-const quiz = (input, collector, interaction) => {
-    const quiz = R.zipObj(['quiz_name', 'results'], [R.trim(R.replace('-name', ' ', input)), results]);
-    createJson(quiz, interaction);
-    collector.stop();
-}
-
-const createJson = (quiz, interaction) => {
+const quizSave = async (interaction, quiz) => {
     fs.writeFile('quiz.json', JSON.stringify([quiz],null,2),
         async function (err) {
             if (err) console.log('error', err);
-            else await interaction.followUp('quiz saved!')
-
-        });
+            else await interaction.followUp(
+                {embeds: [createEmbed_('✨Quiz saved!✨','Launch it  with /quiz start ')]})
+    });
 }
 
-const createEmbed_ = () => {
+const createEmbed_ = (title, description) => {
     return new MessageEmbed()
-        .setTitle('✨Quiz Generator✨')
+        .setTitle(title)
         .setColor('YELLOW')
-        .setFooter({text : 'To stop, use the command -stop.'})
-        .setDescription(
-            'Welcome to the !c command. To create your quiz you need to send ' +
-            'the text in a multiline format following the next pattern: ' +'\n'+
-            '\n' + 'Question?' +
-            '\n' + 'Correct answer' +
-            '\n' + 'Incorrect answers, separated by commas (3 max)' +'\n'+
-            '\n' + 'Example:' +
-            '\n' + 'Which language is out of place?'  +
-            '\n' + 'HTML' +
-            '\n' + 'Java, C++, JavaScript'
-        );
+        .setDescription(description);
 }
 
 module.exports = {createQuiz};
