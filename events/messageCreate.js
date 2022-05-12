@@ -1,4 +1,4 @@
-const {banUwU} = require('../banUwU');
+const { banUwU } = require('../banUwU');
 
 module.exports = {
 	name: 'messageCreate',

@@ -1,3 +1,5 @@
+/*
+
 const {MessageEmbed} = require('discord.js');
 const fs = require('node:fs');
 const R = require('ramda');
@@ -19,7 +21,7 @@ client.on('interactionCreate', (interaction) => {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const modalCreateQuiz = async (interaction, client)  => {
+const modalCreateQuiz2 = async (interaction, client)  => {
 
 
     await interaction.deferReply();
@@ -87,5 +89,4 @@ const createEmbed_ = (title, description) => {
 }
 
 module.exports = {modalCreateQuiz};
-
-
+*/

@@ -15,8 +15,8 @@ const checkPlayedGameAtInterval = client => setInterval(() => checkOnlineUsersPl
 
 //----------------------------------------------------------------------------------------------------------------------
 
-const constructObjectMemberGamePlayed = member => ({user: member, gamePlayed: member.presence?.activities
-	.find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase()});
+const constructObjectMemberGamePlayed = member => ({ user: member, gamePlayed: member.presence?.activities
+	.find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase() });
 
 const getGameName = member => member.presence?.activities
 	.find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase();
@@ -30,11 +30,11 @@ const checkIfPlayingForbiddenGame = (bannedGames, member) => bannedGames.include
 	.find(activity => activity.type.toString() === 'PLAYING').name.toLowerCase());
 const curriedCheckIfPlayingForbiddenGame = R.curry(checkIfPlayingForbiddenGame)(BannedGames);
 
-const checkIfMemberIsOnline = guild => guild.members.fetch({withPresences: true});
+const checkIfMemberIsOnline = guild => guild.members.fetch({ withPresences: true });
 const getOnlineMembers = R.pipe(R.map(checkIfMemberIsOnline));
 const getGuilds = client => client.guilds.cache.map(guild => client.guilds.cache.get(guild.id));
 
-const t = arr => [...arr.values()];
+const t = arr => [ ...arr.values() ];
 const concatGuildsOnlineMember = R.pipe(R.map(t), R.flatten);
 
 const timeOutWarning = warned => setTimeout(() => checkWarnedMember(warned), INTERVAL_CHECK_BAN);
@@ -88,4 +88,4 @@ const checkWarnedMember = R.pipe(
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = {checkPlayedGameAtInterval};
+module.exports = { checkPlayedGameAtInterval };

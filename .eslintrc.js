@@ -24,6 +24,24 @@ module.exports = {
 		'semi': [
 			'error',
 			'always'
-		]
+		],
+		"comma-dangle": [
+			"error",
+			"always-multiline"
+		],
+		"block-spacing": "error",
+		"array-bracket-spacing": [
+			"error",
+			"always"
+		],
+		"multiline-comment-style": "off",
+		"computed-property-spacing": "off",
+		"space-in-parens": "off",
+		"capitalized-comments": "off",
+		"object-curly-spacing": [
+			"error",
+			"always"
+		],
+		"no-lonely-if": "off"
 	}
 };

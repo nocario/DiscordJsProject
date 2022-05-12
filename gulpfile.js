@@ -1,29 +1,20 @@
-const {src, dest} = require('gulp');
-const gulp = require('gulp');
+const { src, dest } = require('gulp');
 const eslint = require('gulp-eslint');
 const nodemon = require('gulp-nodemon');
+const gulp = require('gulp');
+
 
 gulp.task('lint:fix', function () {
-	return src(['*.js', 'events/*.js']).pipe(eslint({fix:true}))
-		// eslint.format() outputs the lint results to the console.
-		// Alternatively use eslint.formatEach() (see Docs).
+	return src([ '*.js', 'events/*.js' ]).pipe(eslint({ fix:true }))
 		.pipe(eslint.format())
-		// if fixed, write the file to dest
 		.pipe(dest(file => file.base))
-		// To have the process exit with an error code (1) on
-		// lint error, return the stream and pipe to failAfterError
-		// last.
 		.pipe(eslint.failAfterError());
 });
 gulp.task('lint', function () {
-	return src(['*.js', 'events/*.js']).pipe(eslint())
-		// eslint.format() outputs the lint results to the console.
-		// Alternatively use eslint.formatEach() (see Docs).
+	return src([ '*.js', 'events/*.js' ]).pipe(eslint())
 		.pipe(eslint.format())
-		// To have the process exit with an error code (1) on
-		// lint error, return the stream and pipe to failAfterError
-		// last.
 		.pipe(eslint.failAfterError());
+
 });
 
 gulp.task('develop', function (done) {
@@ -31,8 +22,8 @@ gulp.task('develop', function (done) {
 		script: 'index.js',
 		ext: 'js',
 		env: { 'NODE_ENV': 'development' },
-		tasks: ['lint'],
-		done: done});
+		tasks: [ 'lint' ],
+		done: done });
 	stream
 		.on('restart', function () {
 			console.log('restarted!');

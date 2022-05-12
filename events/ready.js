@@ -1,4 +1,4 @@
-const {checkPlayedGameAtInterval} = require('../banForbiddenGames.js');
+const { checkPlayedGameAtInterval } = require('../banForbiddenGames.js');
 
 module.exports = {
 	name: 'ready',
