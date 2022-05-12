@@ -14,39 +14,29 @@ const reactions = [ '💛', '💚', '💙', '💜' ];
 //const dataSelected = R.find(R.propEq('quiz_name', 'so this is permanence'))(data); //TODO
 //const results = R.prop('results', dataSelected); //TODO
 const results = R.prop('results', data[0]);
-
-console.log(results)
 //---------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
 
-	for (let i = 0; i < results.length; i++) {
+	for (const result of results) {
 
-		//R.forEach(async (result) => {
-
-		console.log(results[i]);
 		let usersWithCorrectAnswer = [];
 
-		const correctAnswer = R.prop('correct_answer', results[i]);
-		const incorrectAnswers = R.prop('incorrect_answers', results[i]);
+		const correctAnswer = R.prop('correct_answer', result);
+		const incorrectAnswers = R.prop('incorrect_answers', result);
 		const choices = shuffle(R.concat(incorrectAnswers, [ correctAnswer ]));
 
-		const messageEmbed = await description(choices)(results[i], interaction);
+		const messageEmbed = await description(choices)(result, interaction);
 
 		R.pipe(
 			compose(addReactions)(messageEmbed),
 			compose(
 				collectorOn(usersWithCorrectAnswer),
 				collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
-			(collector(messageEmbed, correctAnswer, choices, interaction)),
-			await sleep(), R.andThen(console.log),
-
-
+			(collector(messageEmbed, correctAnswer, choices, interaction))
 		);
-		await sleep();
+		await wait(QUESTION_INTERVAL);
 	}
-//, results, );
-
 }
 
 const sleep = async () => {
