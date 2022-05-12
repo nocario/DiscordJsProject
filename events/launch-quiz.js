@@ -7,38 +7,47 @@ const { intersection } = require('ramda');
 const wait = require('node:timers/promises').setTimeout;
 
 //---------------------------------------------------------------------------------------------------------------------
-const QUESTION_INTERVAL = 30000;
+const QUESTION_INTERVAL = 10000;
 const TIME_MAX = 15000;
 const reactions = [ '💛', '💚', '💙', '💜' ];
 
 //const dataSelected = R.find(R.propEq('quiz_name', 'so this is permanence'))(data); //TODO
 //const results = R.prop('results', dataSelected); //TODO
 const results = R.prop('results', data[0]);
+
+console.log(results)
 //---------------------------------------------------------------------------------------------------------------------
 
-const launchQuiz = async (interaction) => R.forEach(async (result) => {
+const launchQuiz = async (interaction) => {
 
-	let usersWithCorrectAnswer = [];
+	for (let i = 0; i < results.length; i++) {
 
-	const correctAnswer = R.prop('correct_answer', result);
-	const incorrectAnswers = R.prop('incorrect_answers', result);
-	const choices = shuffle(R.concat(incorrectAnswers, [ correctAnswer ]));
+		//R.forEach(async (result) => {
 
-	const messageEmbed = await description(choices)(result, interaction);
+		console.log(results[i]);
+		let usersWithCorrectAnswer = [];
 
-	R.pipe(
-		compose(addReactions)(messageEmbed),
-		compose(
-			collectorOn(usersWithCorrectAnswer),
-			collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
-		(collector(messageEmbed, correctAnswer, choices, interaction)),
-		await sleep(), R.andThen(console.log),
+		const correctAnswer = R.prop('correct_answer', results[i]);
+		const incorrectAnswers = R.prop('incorrect_answers', results[i]);
+		const choices = shuffle(R.concat(incorrectAnswers, [ correctAnswer ]));
+
+		const messageEmbed = await description(choices)(results[i], interaction);
+
+		R.pipe(
+			compose(addReactions)(messageEmbed),
+			compose(
+				collectorOn(usersWithCorrectAnswer),
+				collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
+			(collector(messageEmbed, correctAnswer, choices, interaction)),
+			await sleep(), R.andThen(console.log),
 
 
-	);
-	await sleep();
-}, results,
-);
+		);
+		await sleep();
+	}
+//, results, );
+
+}
 
 const sleep = async () => {
 	console.log('ok');
@@ -82,7 +91,7 @@ const collector = (embed, answer, choices, interaction) =>
 	getCollector(embed)(getFilter(correctAnswerEmoji(answer, choices), interaction));
 
 const collectorOn = (list) => (collector) => collector.on('collect', (reaction, user) => {
-	list.push(user.username);
+	if (user.username != 'Big Brother') list.push(user.username);
 	console.log(user.username);
 }); //R.append(user.username, usersWithCorrectAnswer) => doesnt work, check later why
 
@@ -100,4 +109,3 @@ const collectorEnd = (list, answer, interaction) => (collector) => collector.on(
 //---------------------------------------------------------------------------------------------------------------------
 
 module.exports = { launchQuiz };
-
