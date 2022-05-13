@@ -51,6 +51,38 @@
           "the eternal",
           "decades"
         ]
+      },
+      {
+        "question": "after death, what's left?",
+        "correct_answer": "new order",
+        "incorrect_answers": [
+          "old order",
+          "warsaw",
+          "unknown pleasures"
+        ]
+      }
+    ]
+  },
+  {
+    "quiz_name": "s",
+    "results": [
+      {
+        "question": "tram?",
+        "correct_answer": "s",
+        "incorrect_answers": [
+          "sss",
+          "ss",
+          "ssss"
+        ]
+      },
+      {
+        "question": "human consist of",
+        "correct_answer": "onion layers",
+        "incorrect_answers": [
+          "several liters of liquid",
+          "feelings, etc",
+          "thirst of blood"
+        ]
       }
     ]
   }
