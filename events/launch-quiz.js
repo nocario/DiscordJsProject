@@ -1,56 +1,48 @@
 const { MessageEmbed } = require('discord.js');
-const data = require('../quiz.json');
-const fs = require('node:fs');
-const R = require('ramda');
 const shuffle = require('shuffle-array');
-const { intersection } = require('ramda');
+const R = require('ramda');
+const data = require('../quiz.json');
 const wait = require('node:timers/promises').setTimeout;
 
 //---------------------------------------------------------------------------------------------------------------------
 const QUESTION_INTERVAL = 20000;
 const TIME_MAX = 15000;
 const reactions = [ '💛', '💚', '💙', '💜' ];
-
 const quizzes_name = R.pluck('quiz_name', data);
-
-
-//const results = R.prop('results', dataSelected);
-//const results = R.prop('results', data[0]);  antoine
 //----------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
-
-	//const quizName = () => { return  interaction.options.getString('selected');}
-
-	//const dataSelected = R.find(R.propEq('quiz_name', 'so this is permanence'))(data); //TODO
-//const results = R.prop('results', dataSelected); //TODO
-
-
-	console.log( R.prop('results', interaction.options.getString('selected')));
 	R.cond([
-		[ R.equals('last'), async () => await main(interaction, R.prop('results', data[0]))],
+		[ R.equals('last'), async () => await main(interaction, results(data[0]))],
 		[ R.equals('random'), async () => await main(interaction, randomQuiz())],
-		[ R.equals('selected'), async () => await main(interaction, R.prop('results', selectedQuiz(interaction)))],
+		[ R.equals('select'), async () => await main(interaction, await selectedQuiz(interaction))],
 		[ R.equals('list'), async () => await listQuiz(interaction)]
 	])(interaction.options.getSubcommand());
 }
 
-const selectedQuiz = (interaction) => {
-	console.log(R.prop('results', R.find(R.propEq('quiz_name', interaction.options.getString('selected')))(data)));
-	return R.find(R.propEq('quiz_name', interaction.options.getString('selected')))(data);
-}
+const nameSelected = (interaction) => { return interaction.options.getString('selected');}
 
-const randomQuiz = () => { return R.prop('results', shuffle(quizzes_name)[0]);}
+const dataSelected = (interaction) => { return results(R.find(R.propEq('quiz_name', nameSelected(interaction)))(data));}
+
+const results = (quiz) => { return  R.prop('results', quiz)}
 
 const listQuiz = async (interaction) =>  {
-	let embed = createEmbed_('✨ All available quiz ✨',
-		R.join('\n', quizzes_name));
-	return await interaction.followUp({ embeds: [ embed ] });
+	return (await sendEmbed('✨ All available quiz ✨', R.join('\n', quizzes_name)), interaction);
 }
+const randomQuiz = () => {
+	console.log(R.prop('results', shuffle(quizzes_name)[0]));
+	return results(shuffle(quizzes_name)[0]);}
+
+const selectedQuiz = async (interaction) => {
+	const embed = createEmbed_(`✨ ${interaction.options.getString('selected')} quiz was selected ✨`,
+		`You have ${TIME_MAX / 1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫`);
+	await sendEmbed(embed, interaction);
+	await wait(QUESTION_INTERVAL);
+ 	return dataSelected(interaction);
+}
+//----------------------------------------------------------------------------------------------------------------------
 
 const main = async (interaction, results) => {
-
-	console.log(results);
 
 	for (const result of results) {
 
@@ -70,7 +62,6 @@ const main = async (interaction, results) => {
 			(collector(messageEmbed))
 		);
 		await wait(QUESTION_INTERVAL);
-		console.log(usersWithCorrectAnswer);
 	}
 }
 
@@ -89,9 +80,10 @@ const createQuestionDescription = (options, list) => {
 };
 
 const createQuestionEmbed = (description) => async (results, interaction) => {
-	let embed = createEmbed_(`\n✨ ${R.prop('question', results)} ✨ \n`, description);
-	return await interaction.followUp({ embeds: [ embed ] });
+	return await sendEmbed(createEmbed_(`\n✨ ${R.prop('question', results)} ✨ \n`, description), interaction);
 };
+
+const sendEmbed = async (embed, interaction) => { return interaction.followUp({embeds: [embed]});}
 
 const createEmbed_ = (title, description) => {
 	return new MessageEmbed()
@@ -126,7 +118,7 @@ const collectorEnd = (list, answer, interaction) => (collector) => collector.on(
 			`${R.join(', ', list)} \n The correct answer was ${answer}`,
 		)),
 	);
-	await interaction.followUp({ embeds: [ result(list) ] });
+	await sendEmbed(result(list), interaction);
 });
 
 //---------------------------------------------------------------------------------------------------------------------
