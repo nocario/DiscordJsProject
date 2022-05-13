@@ -5,40 +5,44 @@ const data = require('../quiz.json');
 const wait = require('node:timers/promises').setTimeout;
 
 //---------------------------------------------------------------------------------------------------------------------
-const QUESTION_INTERVAL = 10000;
-const TIME_MAX = 15000;
+const QUESTION_INTERVAL = 15000;
+const TIME_MAX = 10000;
 const reactions = [ '💛', '💚', '💙', '💜' ];
 const quizzes_name = R.pluck('quiz_name', data);
 //----------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
 	R.cond([
-		[ R.equals('random'), async () => await main(interaction, randomQuiz())],
-		[ R.equals('select'), async () => await main(interaction, await selectedQuiz(interaction))],
+		[ R.equals('random'), async () => await main(interaction, await quiz(interaction, shuffle(quizzes_name)[0]))],
+		[ R.equals('select'), async () => await main(interaction, await quiz(interaction, nameSelected(interaction)))],
 		[ R.equals('list'), async () => await listQuiz(interaction)]
+		//[ R.T, async () =>  ]
 	])(interaction.options.getSubcommand());
 }
 
-const nameSelected = (interaction) => { return interaction.options.getString('selected');}
+const nameSelected = (interaction) => {
 
-const dataSelected = (interaction) => { return results(R.find(R.propEq('quiz_name', nameSelected(interaction)))(data));}
+	return interaction.options.getString('selected');
+}
 
-const results = (quiz) => { return  R.prop('results', quiz)}
+const resultsByQuizName = (quizName) => { return R.prop('results', R.find(R.propEq('quiz_name',quizName))(data))}
 
 const listQuiz = async (interaction) =>  {
-	return (await sendEmbed('✨ All available quiz ✨', R.join('\n', quizzes_name)), interaction);
+	return await sendEmbed('✨ All available quiz ✨', R.join('\n', quizzes_name), interaction);
 }
-const randomQuiz = () => {
-	console.log(R.prop('results', shuffle(quizzes_name)[0]));
-	return results(shuffle(quizzes_name)[0]);}
 
-const selectedQuiz = async (interaction) => {
-	const embed = createEmbed_(`✨ ${interaction.options.getString('selected')} quiz was selected ✨`,
+const quiz = async (interaction, name) => {
+	await createStartQuizMessage(interaction, name);
+	return resultsByQuizName(name);
+}
+
+const createStartQuizMessage = async (interaction, title) =>{
+	const embed = createEmbed_(`✨ ${title} ✨`,
 		`You have ${TIME_MAX / 1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫`);
 	await sendEmbed(embed, interaction);
-	await wait(QUESTION_INTERVAL);
- 	return dataSelected(interaction);
+	return await wait(QUESTION_INTERVAL);
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 
 const main = async (interaction, results) => {
@@ -92,9 +96,9 @@ const createEmbed_ = (title, description) => {
 
 const description = (choices) => createQuestionEmbed(createQuestionDescription(choices,[]));
 
-const getCollector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
+const collector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
 
-const collector = (embed) => getCollector(embed);
+//const collector = (embed) => getCollector(embed);
 
 const collectorOn = (list, answer, looserList) => (collector) => collector.on('collect', (reaction, user) => {
 		if (!user.bot) {
