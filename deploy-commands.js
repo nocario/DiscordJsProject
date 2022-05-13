@@ -34,9 +34,6 @@ const commands = [
 	, new SlashCommandBuilder()
 		.setName('start')
 		.setDescription('start quiz')
-	, new SlashCommandBuilder()
-		.setName('modal')
-		.setDescription('testing part')
 	, new SlashCommandBuilder().setName('tis').setDescription('Replies with Tis but a scratch')
 	, new SlashCommandBuilder().setName('biggus').setDescription('Replies with the Biggus Dickus scene')
 	, new SlashCommandBuilder().setName('sacred').setDescription('Replies with Every Sperm is Sacred'),

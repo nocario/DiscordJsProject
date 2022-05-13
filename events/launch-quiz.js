@@ -28,9 +28,7 @@ const launchQuiz = async (interaction) => R.forEach(async (result) => {
 
 	R.pipe(
 		compose(addReactions)(messageEmbed),
-		compose(
-			collectorOn(usersWithCorrectAnswer),
-			collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
+		compose(collectorOn(usersWithCorrectAnswer), collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
 		(collector(messageEmbed, correctAnswer, choices, interaction)),
 		await sleep(), R.andThen(console.log),
 

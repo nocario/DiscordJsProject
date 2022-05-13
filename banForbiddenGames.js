@@ -2,7 +2,6 @@ const R = require('ramda');
 
 const BannedGames = [
 	'fortnite',
-	'fallout',
 	'fallout 4',
 ];
 
