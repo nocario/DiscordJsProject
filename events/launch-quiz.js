@@ -7,7 +7,7 @@ const { intersection } = require('ramda');
 const wait = require('node:timers/promises').setTimeout;
 
 //---------------------------------------------------------------------------------------------------------------------
-const QUESTION_INTERVAL = 10000;
+const QUESTION_INTERVAL = 20000;
 const TIME_MAX = 15000;
 const reactions = [ '💛', '💚', '💙', '💜' ];
 
@@ -55,6 +55,7 @@ const main = async (interaction, results) => {
 	for (const result of results) {
 
 		let usersWithCorrectAnswer = [];
+		const looserList = new Set();
 
 		const correctAnswer = R.prop('correct_answer', result);
 		const incorrectAnswers = R.prop('incorrect_answers', result);
@@ -104,17 +105,17 @@ const description = (choices) => createQuestionEmbed(createQuestionDescription(c
 const getCollector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
 
 const collector = (embed) => getCollector(embed);
-
 const collectorOn = (list, answer, looserList) => (collector) => collector.on('collect', (reaction, user) => {
+	console.log(user);
 		if (!user.bot) {
 			if (reaction.emoji.name !== answer) {
-				looserList.add(user.username);
+				looserList.add(user);
 			}
-			else if (!looserList.has(user.username)) {
+			else if (!looserList.has(user)) {
 				list.push(user.username);
 			}
-
 		}
+
 });
 
 const collectorEnd = (list, answer, interaction) => (collector) => collector.on('end', async () => {
