@@ -13,7 +13,6 @@ const quizzes_name = R.pluck('quiz_name', data);
 
 const launchQuiz = async (interaction) => {
 	R.cond([
-		[ R.equals('last'), async () => await main(interaction, results(data[0]))],
 		[ R.equals('random'), async () => await main(interaction, randomQuiz())],
 		[ R.equals('select'), async () => await main(interaction, await selectedQuiz(interaction))],
 		[ R.equals('list'), async () => await listQuiz(interaction)]
