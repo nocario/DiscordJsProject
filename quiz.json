@@ -39,5 +39,19 @@
         ]
       }
     ]
+  },
+  {
+    "quiz_name": "so this is permanence",
+    "results": [
+      {
+        "question": "which track is not included in the album closer by JD?",
+        "correct_answer": "centuries",
+        "incorrect_answers": [
+          "twenty four hours",
+          "the eternal",
+          "decades"
+        ]
+      }
+    ]
   }
 ]

@@ -7,9 +7,6 @@ let results = [];
 
 const createQuiz = async (interaction)  => {
 
-
-
-
 	const getString = (name) => interaction.options.getString(name);
 
 	const quiz = () => { return R.zipObj([ 'quiz_name', 'results' ], [ getString('name'), results ]); };
