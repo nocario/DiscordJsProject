@@ -34,6 +34,33 @@ const commands = [
 	, new SlashCommandBuilder()
 		.setName('start')
 		.setDescription('start quiz')
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('random')
+				.setDescription('start random quiz'),
+
+		)
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('last')
+				.setDescription('start last quiz'),
+		)
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('select')
+				.setDescription('select quiz by name ')
+				.addStringOption(option => option.setName('selected').setDescription('quiz selected name').setRequired(true)),
+
+		)
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('list')
+				.setDescription('show all quiz names'),
+		)
+
+	, new SlashCommandBuilder()
+		.setName('modal')
+		.setDescription('testing part')
 	, new SlashCommandBuilder().setName('tis').setDescription('Replies with Tis but a scratch')
 	, new SlashCommandBuilder().setName('biggus').setDescription('Replies with the Biggus Dickus scene')
 	, new SlashCommandBuilder().setName('sacred').setDescription('Replies with Every Sperm is Sacred'),

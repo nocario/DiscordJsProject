@@ -8,3 +8,4 @@ functionality:
 
 link discord: https://discord.gg/RcnPPtYf
 
+gulp lint:fix
