@@ -45,7 +45,7 @@ const createStartQuizMessage = async (interaction, title) =>{
 	const embed = createEmbed_(`✨ ${title} ✨`,
 		`You have ${TIME_MAX / 1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫
 		\n`);
-	return await sendEmbed(embed, interaction);
+	await sendEmbed(embed, interaction);
 	return await wait(TIME_MAX/2);
 }
 const sendEmbed = async (embed, interaction) => { return await interaction.followUp({embeds: [embed]});}
