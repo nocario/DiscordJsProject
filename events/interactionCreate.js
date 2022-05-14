@@ -29,20 +29,5 @@ module.exports = {
 	name: 'interactionCreate',
 	async execute(interaction) {
 		await isCommand(interaction);
-
-		//await interaction.deferReply();
-		//await wait(1000);
-
-		/*
-        if (!interaction.isCommand()) return;
-        const { commandName } = interaction;
-        if (commandName === 'biggus') {
-            await interaction.reply('https://www.youtube.com/watch?v=yzgS61zgPEg');
-        } else if (commandName === 'tis') {
-            await interaction.reply('https://www.youtube.com/watch?v=ZmInkxbvlCs');
-        } else if (commandName === 'sacred') {
-            await interaction.reply('https://www.youtube.com/watch?v=fUspLVStPbk');
-        }
-         */
 	},
 };

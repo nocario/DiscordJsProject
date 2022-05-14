@@ -3,6 +3,7 @@ const shuffle = require('shuffle-array');
 const R = require('ramda');
 const data = require('../quiz.json');
 const wait = require('node:timers/promises').setTimeout;
+const { muteLooser } = require('../banQuiz');
 
 //---------------------------------------------------------------------------------------------------------------------
 const QUESTION_INTERVAL = 20000;
@@ -23,7 +24,6 @@ const launchQuiz = async (interaction) => {
 const nameSelected = (interaction) => { return interaction.options.getString('selected');}
 
 const dataSelected = (interaction) => { return results(R.find(R.propEq('quiz_name', nameSelected(interaction)))(data));}
-
 const results = (quiz) => { return  R.prop('results', quiz)}
 
 const listQuiz = async (interaction) =>  {
@@ -41,7 +41,6 @@ const selectedQuiz = async (interaction) => {
  	return dataSelected(interaction);
 }
 //----------------------------------------------------------------------------------------------------------------------
-
 const main = async (interaction, results) => {
 
 	for (const result of results) {
@@ -52,6 +51,8 @@ const main = async (interaction, results) => {
 		const correctAnswer = R.prop('correct_answer', result);
 		const incorrectAnswers = R.prop('incorrect_answers', result);
 		const choices = shuffle(R.concat(incorrectAnswers, [ correctAnswer ]));
+		console.log(choices);
+		console.log(correctAnswer)
 
 		const messageEmbed = await description(choices)(result, interaction);
 
@@ -62,13 +63,14 @@ const main = async (interaction, results) => {
 			(collector(messageEmbed))
 		);
 		await wait(QUESTION_INTERVAL);
+
 	}
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 const compose = (...funcs) => initialArg => funcs.reduce((acc, func) => func(acc), initialArg);
-
 const correctAnswerEmoji = (correctAnswer, choices) => R.nth(R.indexOf(correctAnswer, choices))(reactions);
 
 const addReactions = (embed) => R.forEach((reaction) => { embed.react(reaction); }, reactions);
@@ -97,16 +99,18 @@ const description = (choices) => createQuestionEmbed(createQuestionDescription(c
 const getCollector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
 
 const collector = (embed) => getCollector(embed);
-const collectorOn = (list, answer, looserList) => (collector) => collector.on('collect', (reaction, user) => {
-	console.log(user);
+
+const collectorOn =  (list, answer, looserList) => (collector) => collector.on('collect',async (reaction, user) => {
 		if (!user.bot) {
 			if (reaction.emoji.name !== answer) {
 				looserList.add(user);
+				muteLooser(reaction,user);
 			}
 			else if (!looserList.has(user)) {
 				list.push(user.username);
 			}
 		}
+		console.log(looserList);
 
 });
 
