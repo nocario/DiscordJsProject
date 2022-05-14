@@ -2,7 +2,6 @@ const R = require('ramda');
 
 const BannedGames = [
 	'fortnite',
-	'fallout',
 	'fallout 4',
 ];
 
@@ -34,8 +33,8 @@ const checkIfMemberIsOnline = guild => guild.members.fetch({ withPresences: true
 const getOnlineMembers = R.pipe(R.map(checkIfMemberIsOnline));
 const getGuilds = client => client.guilds.cache.map(guild => client.guilds.cache.get(guild.id));
 
-const t = arr => [ ...arr.values() ];
-const concatGuildsOnlineMember = R.pipe(R.map(t), R.flatten);
+const getValueOfMapCollectionValue = arr => [ ...arr.values() ];
+const concatGuildsOnlineMember = R.pipe(R.map(getValueOfMapCollectionValue), R.flatten);
 
 const timeOutWarning = warned => setTimeout(() => checkWarnedMember(warned), INTERVAL_CHECK_BAN);
 
