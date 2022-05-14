@@ -14,7 +14,7 @@ const useCommand = R.pipe(R.cond([
 	[ R.curry(checkCommandName)('biggus'), R.curry(sendReply)('https://www.youtube.com/watch?v=yzgS61zgPEg') ],
 	[ R.curry(checkCommandName)('tis'), R.curry(sendReply)('https://www.youtube.com/watch?v=ZmInkxbvlCs') ],
 	[ R.curry(checkCommandName)('sacred'), R.curry(sendReply)('https://www.youtube.com/watch?v=fUspLVStPbk') ],
-	[ R.curry(checkCommandName)('quiz'),R.pipe(deferReply, R.andThen(createQuiz)) ],
+	[ R.curry(checkCommandName)('quiz'),R.pipe(deferReply, R.andThen(createQuiz))],
 	[ R.curry(checkCommandName)('start'), R.pipe(deferReply, R.andThen(launchQuiz)) ],
 
 ]));

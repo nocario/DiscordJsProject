@@ -1,87 +1,14 @@
 [
   {
-    "quiz_name": "peu importe",
+    "quiz_name": "sebila",
     "results": [
       {
-        "question": "What is the name of the \"first\" chinese dinasty",
-        "correct_answer": "Xia",
+        "question": "the best color",
+        "correct_answer": "yellow",
         "incorrect_answers": [
-          "Tang",
-          "Zhou",
-          "Shang"
-        ]
-      },
-      {
-        "question": "What is the name of the second roman dinasty",
-        "correct_answer": "Flavian",
-        "incorrect_answers": [
-          "Julio-Claudian",
-          "Severan",
-          "Antonine"
-        ]
-      },
-      {
-        "question": "Who is the founder of the Severan dynastie",
-        "correct_answer": "Septimus Severus",
-        "incorrect_answers": [
-          "Hadrian",
-          "Ulpia Severina",
-          "Severus Alexander"
-        ]
-      },
-      {
-        "question": "First of the five good emperor",
-        "correct_answer": "Nerva",
-        "incorrect_answers": [
-          "Trajan",
-          "Hadrian",
-          "Augustus"
-        ]
-      }
-    ]
-  },
-  {
-    "quiz_name": "so this is permanence",
-    "results": [
-      {
-        "question": "which track is not included in the album closer by JD?",
-        "correct_answer": "centuries",
-        "incorrect_answers": [
-          "twenty four hours",
-          "the eternal",
-          "decades"
-        ]
-      },
-      {
-        "question": "after death, what's left?",
-        "correct_answer": "new order",
-        "incorrect_answers": [
-          "old order",
-          "warsaw",
-          "unknown pleasures"
-        ]
-      }
-    ]
-  },
-  {
-    "quiz_name": "s",
-    "results": [
-      {
-        "question": "tram?",
-        "correct_answer": "s",
-        "incorrect_answers": [
-          "sss",
-          "ss",
-          "ssss"
-        ]
-      },
-      {
-        "question": "human consist of",
-        "correct_answer": "onion layers",
-        "incorrect_answers": [
-          "several liters of liquid",
-          "feelings, etc",
-          "thirst of blood"
+          "red",
+          "blue",
+          "green"
         ]
       }
     ]

@@ -23,7 +23,7 @@ const createQuiz = async (interaction)  => {
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-//testable
+
 const zipQuestion = (question, answer, options) => {
 	return R.zipObj([ 'question', 'correct_answer', 'incorrect_answers' ], [ question, answer, options ]);
 };
@@ -54,6 +54,9 @@ const quizSave = async (interaction, quiz) => {
 				{ embeds: [ createEmbed_('✨Quiz saved!✨','Launch it  with /quiz start ') ] });
 		});
 };
+
+const sendEmbed = async (embed, interaction) => { return interaction.followUp({embeds: [embed]});}
+
 const createEmbed_ = (title, description) => {
 	return new MessageEmbed()
 		.setTitle(title)
@@ -61,4 +64,4 @@ const createEmbed_ = (title, description) => {
 		.setDescription(description);
 };
 
-module.exports = { createQuiz, createEmbed_, zipQuestion };
+module.exports = { createQuiz };
