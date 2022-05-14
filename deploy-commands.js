@@ -42,11 +42,6 @@ const commands = [
 		)
 		.addSubcommand(subcommand =>
 			subcommand
-				.setName('last')
-				.setDescription('start last quiz'),
-		)
-		.addSubcommand(subcommand =>
-			subcommand
 				.setName('select')
 				.setDescription('select quiz by name ')
 				.addStringOption(option => option.setName('selected').setDescription('quiz selected name').setRequired(true)),

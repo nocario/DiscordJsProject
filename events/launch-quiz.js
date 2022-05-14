@@ -5,46 +5,56 @@ const data = require('../quiz.json');
 const wait = require('node:timers/promises').setTimeout;
 
 //---------------------------------------------------------------------------------------------------------------------
-const QUESTION_INTERVAL = 10000;
-const TIME_MAX = 15000;
+const QUESTION_INTERVAL = 15000;
+const TIME_MAX = 10000;
 const reactions = [ '💛', '💚', '💙', '💜' ];
-const quizzes_name = R.pluck('quiz_name', data);
+const namesList = R.pluck('quiz_name', data);
 //----------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
-	R.cond([
-		[ R.equals('random'), async () => await main(interaction, randomQuiz())],
-		[ R.equals('select'), async () => await main(interaction, await selectedQuiz(interaction))],
+ 	R.cond([
+		[ R.equals('random'), async () => await main(interaction, await quiz(interaction, shuffle(namesList)[0]))],
+		[ R.equals('select'), async () => await nameSelected(interaction, interaction.options.getString('selected'))],
 		[ R.equals('list'), async () => await listQuiz(interaction)]
 	])(interaction.options.getSubcommand());
 }
 
-const nameSelected = (interaction) => { return interaction.options.getString('selected');}
+const nameSelected = async (interaction, name) => {
+	if (R.includes(name, namesList)){ // check if quiz even exist, doesnt work with R.if else
+		await main(interaction, await quiz(interaction, name))
+	}
+	else {
+		await sendEmbed(
+			createEmbed_('Quiz not found 😢','Use /start list to get the available'), interaction);
+	}
+}
 
-const dataSelected = (interaction) => { return results(R.find(R.propEq('quiz_name', nameSelected(interaction)))(data));}
-
-const results = (quiz) => { return  R.prop('results', quiz)}
+const resultsByQuizName = (quizName) => { return R.prop('results', R.find(R.propEq('quiz_name', quizName))(data))}
 
 const listQuiz = async (interaction) =>  {
-	return (await sendEmbed('✨ All available quiz ✨', R.join('\n', quizzes_name)), interaction);
+	const embed = createEmbed_('✨ All available quiz ✨', R.join('\n', namesList));
+	return await sendEmbed(embed, interaction);
 }
-const randomQuiz = () => {
-	console.log(R.prop('results', shuffle(quizzes_name)[0]));
-	return results(shuffle(quizzes_name)[0]);}
 
-const selectedQuiz = async (interaction) => {
-	const embed = createEmbed_(`✨ ${interaction.options.getString('selected')} quiz was selected ✨`,
+const quiz = async (interaction, name) => {
+	await createStartQuizMessage(interaction, name);
+	return resultsByQuizName(name);
+}
+
+const createStartQuizMessage = async (interaction, title) =>{
+	const embed = createEmbed_(`✨ ${title} ✨`,
 		`You have ${TIME_MAX / 1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫`);
 	await sendEmbed(embed, interaction);
-	await wait(QUESTION_INTERVAL);
- 	return dataSelected(interaction);
+	//return await wait(QUESTION_INTERVAL);
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 
 const main = async (interaction, results) => {
 
 	for (const result of results) {
 
+		let participants = {};
 		let usersWithCorrectAnswer = [];
 
 		const correctAnswer = R.prop('correct_answer', result);
@@ -55,7 +65,7 @@ const main = async (interaction, results) => {
 
 		R.pipe(
 			compose(addReactions)(messageEmbed),
-			compose(collectorOn(usersWithCorrectAnswer, correctAnswerEmoji(correctAnswer, choices), looserList),
+			compose(collectorOn(usersWithCorrectAnswer, correctAnswerEmoji(correctAnswer, choices), participants),
 				    collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
 			(collector(messageEmbed))
 		);
@@ -92,27 +102,38 @@ const createEmbed_ = (title, description) => {
 
 const description = (choices) => createQuestionEmbed(createQuestionDescription(choices,[]));
 
-const getCollector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
+const filter = (reaction, user) => { return !user.bot;};
 
-const collector = (embed) => getCollector(embed);
+const collector = (embed) => { return embed.createReactionCollector({filter, time: TIME_MAX }); };
 
-const collectorOn = (list, answer, looserList) => (collector) => collector.on('collect', (reaction, user) => {
-		if (!user.bot) {
-			if (reaction.emoji.name !== answer) {
-				looserList.add(user.username);
-			}
-			else if (!looserList.has(user.username)) {
-				list.push(user.username);
-			}
+const collectorOn = (list, answer, participants) =>
+	(collector) => collector.on('collect', (reaction, user) => {
+
+		console.log('--------');
+
+		console.log(R.prop(user.username, participants));
+		console.log(R.isNil(R.prop(user.username, participants)));
+
+		if (R.isNil(R.prop(user.username, participants))) {
+			participants = R.assoc(user.username, 0, participants);
+		}
+		if(reaction.emoji.name === answer) {
+			list.push(user.username);
+
+			participants = R.over(R.lensProp('taredalen'), R.inc, participants);
+
 
 		}
-});
+		console.log({ participants });
+		return participants;
+	}
+);
 
 const collectorEnd = (list, answer, interaction) => (collector) => collector.on('end', async () => {
 	const result = R.ifElse(
 		R.isEmpty,
 		R.always(createEmbed_('Time\'s Up! No one got it.... 🦉', `\n The correct answer was ${answer}`)),
-		R.always(createEmbed_('Great! Here\'s who got it first 🍒:',
+		R.always(createEmbed_('Great! Here\'s who got it first 🍒:\n',
 			`${R.join(', ', list)} \n The correct answer was ${answer}`,
 		)),
 	);

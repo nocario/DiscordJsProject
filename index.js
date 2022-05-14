@@ -30,5 +30,60 @@ const curriedCheckExecuteEvent = R.curry(checkExecuteEvent)(client);
 const events = R.pipe(R.forEach(curriedCheckExecuteEvent));
 events(eventFiles);
 
+/*
+
+const l = [ 'peu importe', 'so this is permanence', 's' ];
+const f1 = R.both(R.equals(R.__, 's'),  R.includes(R.__, l));
+console.log(f1('s'));*/
+
+
+let d = { };
+
+d =  R.append(R.assoc('c', 3), d);
+console.log(d);
+
+d = R.assoc('c', 3, d);
+console.log(d);
+d = R.assoc('c', 3, d);
+console.log(d);
+d = R.assoc('c', 3, d);
+console.log(d)
+
+let u = { user : 0};
+u = R.set(R.lensProp('user'), R.inc, u);
+
+var xLens = R.lensProp('x');
+
+R.set(xLens, 4, {x: 1, y: 2});
+console.log(xLens);
+console.log(u);
+
+
+let participants = {}
+;
+
+
+
+
+const user = R.lensProp('taredalen');
+
+const result2 = R.set(R.lensProp('taredalen'), '1', participants);
+
+const results=['s','s'];
+
+for (const result of results) {
+	const result = R.view(user, participants);
+
+	if (R.isNil(result)) {
+
+		console.log('n');
+		R.append({'taredalen': 0}, participants);
+	} else if (result === 's') {
+		participants = R.over(R.lensProp('taredalen'), R.inc, participants);
+
+	}
+
+	console.log({participants});
+}
 //----------------------------------------------------------------------------------------------------------------------
 client.login(token).then();
