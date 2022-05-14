@@ -14,33 +14,41 @@ const quizzes_name = R.pluck('quiz_name', data);
 
 const launchQuiz = async (interaction) => {
 	R.cond([
-		[ R.equals('last'), async () => await main(interaction, results(data[0]))],
-		[ R.equals('random'), async () => await main(interaction, randomQuiz())],
-		[ R.equals('select'), async () => await main(interaction, await selectedQuiz(interaction))],
+		[ R.equals('random'), async () => await main(interaction, await quiz(interaction, shuffle(quizzes_name)[0]))],
+		[ R.equals('select'), async () => await main(interaction, await quiz(interaction, nameSelected(interaction)))],
 		[ R.equals('list'), async () => await listQuiz(interaction)]
+		//[ R.T, async () =>  ]
 	])(interaction.options.getSubcommand());
 }
 
-const nameSelected = (interaction) => { return interaction.options.getString('selected');}
+const nameSelected = (interaction) => {
 
-const dataSelected = (interaction) => { return results(R.find(R.propEq('quiz_name', nameSelected(interaction)))(data));}
-const results = (quiz) => { return  R.prop('results', quiz)}
+	return interaction.options.getString('selected');
+}
+
+const resultsByQuizName = (quizName) => { return R.prop('results', R.find(R.propEq('quiz_name',quizName))(data))}
 
 const listQuiz = async (interaction) =>  {
-	return (await sendEmbed('✨ All available quiz ✨', R.join('\n', quizzes_name)), interaction);
+	return await sendEmbed('✨ All available quiz ✨', R.join('\n', quizzes_name), interaction);
+}
+
+const quiz = async (interaction, name) => {
+	await createStartQuizMessage(interaction, name);
+	return resultsByQuizName(name);
 }
 const randomQuiz = () => {
 	console.log(R.prop('results', shuffle(quizzes_name)[0]));
 	return results(shuffle(quizzes_name)[0]);}
 
-const selectedQuiz = async (interaction) => {
-	const embed = createEmbed_(`✨ ${interaction.options.getString('selected')} quiz was selected ✨`,
+const createStartQuizMessage = async (interaction, title) =>{
+	const embed = createEmbed_(`✨ ${title} ✨`,
 		`You have ${TIME_MAX / 1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫`);
 	await sendEmbed(embed, interaction);
-	await wait(QUESTION_INTERVAL);
- 	return dataSelected(interaction);
+	return await wait(QUESTION_INTERVAL);
 }
+
 //----------------------------------------------------------------------------------------------------------------------
+
 const main = async (interaction, results) => {
 
 	for (const result of results) {
@@ -51,8 +59,6 @@ const main = async (interaction, results) => {
 		const correctAnswer = R.prop('correct_answer', result);
 		const incorrectAnswers = R.prop('incorrect_answers', result);
 		const choices = shuffle(R.concat(incorrectAnswers, [ correctAnswer ]));
-		console.log(choices);
-		console.log(correctAnswer)
 
 		const messageEmbed = await description(choices)(result, interaction);
 
@@ -63,14 +69,13 @@ const main = async (interaction, results) => {
 			(collector(messageEmbed))
 		);
 		await wait(QUESTION_INTERVAL);
-
 	}
-
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
 const compose = (...funcs) => initialArg => funcs.reduce((acc, func) => func(acc), initialArg);
+
 const correctAnswerEmoji = (correctAnswer, choices) => R.nth(R.indexOf(correctAnswer, choices))(reactions);
 
 const addReactions = (embed) => R.forEach((reaction) => { embed.react(reaction); }, reactions);
@@ -96,9 +101,9 @@ const createEmbed_ = (title, description) => {
 
 const description = (choices) => createQuestionEmbed(createQuestionDescription(choices,[]));
 
-const getCollector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
+const collector = (embed) => { return embed.createReactionCollector({time: TIME_MAX }); };
 
-const collector = (embed) => getCollector(embed);
+//const collector = (embed) => getCollector(embed);
 
 const collectorOn =  (list, answer, looserList) => (collector) => collector.on('collect',async (reaction, user) => {
 		if (!user.bot) {
@@ -109,6 +114,7 @@ const collectorOn =  (list, answer, looserList) => (collector) => collector.on('
 			else if (!looserList.has(user)) {
 				list.push(user.username);
 			}
+
 		}
 		console.log(looserList);
 
