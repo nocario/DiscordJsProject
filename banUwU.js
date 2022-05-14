@@ -2,7 +2,7 @@ const R = require('ramda');
 
 const sendBanMessage = (member) => member.guild.channels.cache.find(channel => channel.name === 'general')
 	.send(`${member.user} has been banned for using shameful language`);
-const checkUwU = R.pipe(R.prop('content'), R.toLower, R.includes('uwu'));
+const checkUwU = R.pipe(R.prop('content'), R.toLower, R.includes('uwu')); //testable
 const muteUser = (member) => member.disableCommunicationUntil(Date.now() + 60 * 1000);
 const banUser = R.pipe(R.invoker(0, 'ban'), R.andThen(sendBanMessage));
 const banUserIfBannable = R.ifElse(
@@ -20,4 +20,4 @@ const banUwU = R.pipe(
 	),
 );
 
-module.exports = { banUwU };
+module.exports = { banUwU, checkUwU };

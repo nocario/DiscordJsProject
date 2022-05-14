@@ -32,13 +32,12 @@ const curriedCheckIfPlayingForbiddenGame = R.curry(checkIfPlayingForbiddenGame)(
 const checkIfMemberIsOnline = guild => guild.members.fetch({ withPresences: true });
 const getOnlineMembers = R.pipe(R.map(checkIfMemberIsOnline));
 const getGuilds = client => client.guilds.cache.map(guild => client.guilds.cache.get(guild.id));
-
-const getValueOfMapCollectionValue = arr => [ ...arr.values() ];
-const concatGuildsOnlineMember = R.pipe(R.map(getValueOfMapCollectionValue), R.flatten);
+const getValueOfMapCollection = arr => [ ...arr.values() ];
+const concatGuildsOnlineMember = R.pipe(R.map(getValueOfMapCollection), R.flatten);
 
 const timeOutWarning = warned => setTimeout(() => checkWarnedMember(warned), INTERVAL_CHECK_BAN);
 
-const checkOnlineUserPlayedGame2 = R.pipe(
+const checkOnlineUserPlayedGame = R.pipe(
 	getGuilds,
 	getOnlineMembers,
 	R.bind(Promise.all, Promise),
@@ -49,8 +48,8 @@ const checkOnlineUserPlayedGame2 = R.pipe(
 		R.forEach(sendWarning),
 	)));
 
-const finish = R.pipe(checkOnlineUserPlayedGame2, R.andThen(timeOutWarning));
-const checkOnlineUsersPlayedGame = client => finish(client);
+const checkOnlineUsersPlayedGame = R.pipe(checkOnlineUserPlayedGame, R.andThen(timeOutWarning));
+//const checkOnlineUsersPlayedGame = client => finish(client);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -87,4 +86,4 @@ const checkWarnedMember = R.pipe(
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = { checkPlayedGameAtInterval };
+module.exports = { checkPlayedGameAtInterval, concatGuildsOnlineMember};
