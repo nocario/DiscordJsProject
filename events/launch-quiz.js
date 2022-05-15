@@ -11,7 +11,7 @@ let namesList = R.pluck('quiz_name', data);
 //----------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
-	updateData();
+
 	R.cond([
 		[ R.equals('random'), async () => await startQuiz(interaction, await quiz(interaction, shuffle(namesList)[0]))],
 		[ R.equals('select'), async () => await nameSelected(interaction, interaction.options.getString('selected'))],
@@ -19,12 +19,6 @@ const launchQuiz = async (interaction) => {
 	])(interaction.options.getSubcommand());
 }
 
-const updateData = () => {
-	const readFile = fs.readFileSync('quiz.json');
-	const parsedData = JSON.parse(readFile);
-	data = parsedData;
-	namesList = R.pluck('quiz_name',data);
-}
 
 const nameSelected = async (interaction, name) => {
 	if (R.includes(name, namesList)){

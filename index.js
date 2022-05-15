@@ -1,4 +1,3 @@
-
 const fs = require('node:fs');
 const { Intents } = require('discord.js');
 const R = require('ramda');
@@ -31,4 +30,5 @@ const events = R.pipe(R.forEach(curriedCheckExecuteEvent));
 events(eventFiles);
 
 //----------------------------------------------------------------------------------------------------------------------
+
 client.login(process.env.DISCORD_TOKEN).then();

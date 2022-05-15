@@ -83,47 +83,29 @@
     ]
   },
   {
-    "quiz_name": "d",
+    "quiz_name": "s",
     "results": [
       {
-        "question": "f",
-        "correct_answer": "f",
+        "question": "s",
+        "correct_answer": "s",
         "incorrect_answers": [
-          "f",
-          "f",
-          "f"
+          "s",
+          "s",
+          "s"
         ]
       }
     ]
   },
   {
-    "quiz_name": "z",
-    "results": []
-  },
-  {
-    "quiz_name": "q",
+    "quiz_name": "e",
     "results": [
       {
-        "question": "q",
-        "correct_answer": "q",
+        "question": "e",
+        "correct_answer": "e",
         "incorrect_answers": [
-          "q",
-          "q",
-          "q"
-        ]
-      }
-    ]
-  },
-  {
-    "quiz_name": "wshh",
-    "results": [
-      {
-        "question": "r",
-        "correct_answer": "j",
-        "incorrect_answers": [
-          "k",
-          "l",
-          "m"
+          "e",
+          "e",
+          "e"
         ]
       }
     ]
