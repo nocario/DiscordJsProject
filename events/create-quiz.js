@@ -64,4 +64,4 @@ const createEmbed_ = (title, description) => {
 		.setDescription(description);
 };
 
-module.exports = { createQuiz };
+module.exports = { createQuiz, zipQuestion, createEmbed_ };

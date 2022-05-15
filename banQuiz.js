@@ -1,4 +1,5 @@
 const R = require('ramda');
+
 const announceUserNotBannable = member => member.guild.channels.cache.find(channel => channel.name === 'general')
     .send(`${member} will not be banned despite loosing the quiz`);
 const annonceUserBan = member => member.guild.channels.cache.find(channel => channel.name === 'general')

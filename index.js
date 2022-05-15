@@ -4,6 +4,7 @@ const { Intents } = require('discord.js');
 const R = require('ramda');
 const Discord = require('discord.js');
 const { token } = require('./config.json');
+require('dotenv').config();
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
@@ -32,4 +33,4 @@ const events = R.pipe(R.forEach(curriedCheckExecuteEvent));
 events(eventFiles);
 
 //----------------------------------------------------------------------------------------------------------------------
-client.login(token).then();
+client.login(process.env.DISCORD_TOKEN).then();
