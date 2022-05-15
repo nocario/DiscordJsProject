@@ -4,7 +4,7 @@
   "description": "Bot for discord with discord.js, for Js class",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "test": "mocha"
   },
   "author": "",
@@ -36,6 +36,7 @@
     "heroku": "^7.60.2",
     "parse-entities": "^4.0.0",
     "ramda": "^0.28.0",
-    "shuffle-array": "^1.0.1"
+    "shuffle-array": "^1.0.1",
+    "url-regex": "^5.0.0"
   }
 }

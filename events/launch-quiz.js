@@ -6,7 +6,7 @@ const wait = require('node:timers/promises').setTimeout;
 const { startQuiz } = require('./start-quiz.js');
 const fs = require("node:fs");
 //----------------------------------------------------------------------------------------------------------------------
-const TIME_MAX = 10000;
+const TIME_MAX = 15000;
 let namesList = R.pluck('quiz_name', data);
 //----------------------------------------------------------------------------------------------------------------------
 

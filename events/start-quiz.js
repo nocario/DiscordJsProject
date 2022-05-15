@@ -1,12 +1,12 @@
 const shuffle = require('shuffle-array');
+const urlRegex = require('url-regex');
 const R = require('ramda');
 const {MessageEmbed} = require("discord.js");
 const wait = require('node:timers/promises').setTimeout;
 const {fetchLowestScoringPlayer} = require('../ban-quiz');
-
 //----------------------------------------------------------------------------------------------------------------------
-const QUESTION_INTERVAL = 15000;
-const TIME_MAX = 10000;
+const QUESTION_INTERVAL = 20000;
+const TIME_MAX = 15000;
 let participants = {};
 const reactions = [ '💛', '💚', '💙', '💜' ];
 //----------------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,6 @@ const startQuiz = async (interaction, results) => {
 
     checkIfMoreThanOnePlayer(interaction, participants);
 
-
     const getUsersListScore = R.pipe(R.toPairs, R.map(fetchUserUsername(interaction)), R.bind(Promise.all, Promise));
 
     const embed = createEmbed_('Score', `${await getUsersListScore(participants)}`);
@@ -54,10 +53,8 @@ const checkIfMoreThanOnePlayer = (interaction, participants) => R.ifElse(
     R.always(false)
 )(participants);
 
-const fetchUserUsername = (interaction) => async (list) => `${await interaction.guild.members.fetch(list[0])}: ${list[1]}\n`
-
-
-
+const fetchUserUsername = (interaction) =>
+    async (list) => `${await interaction.guild.members.fetch(list[0])}: ${list[1]}\n`
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -74,16 +71,26 @@ const createQuestionDescription = (options, list) => {
 };
 
 const createQuestionEmbed = (description) => async (results, interaction) => {
-    return await sendEmbed(createEmbed_(`\n✨ ${R.prop('question', results)} ✨ \n`, description), interaction);
+    const question = R.prop('question', results);
+
+    const url = R.ifElse(
+        R.isNil,
+        R.always(' '),
+        R.head
+    )(question.match(urlRegex()));
+
+    return await sendEmbed(
+        createEmbed_(`\n✨ ${R.replace(url, ' ', question)} ✨ \n`, description, url), interaction);
 };
 
 const sendEmbed = async (embed, interaction) => { return interaction.followUp({embeds: [embed]});}
 
-const createEmbed_ = (title, description) => {
+const createEmbed_ = (title, description, url) => {
     return new MessageEmbed()
         .setTitle(title)
         .setColor('YELLOW')
-        .setDescription(description);
+        .setDescription(description)
+        .setImage(url);
 }
 
 const description = (choices) => createQuestionEmbed(createQuestionDescription(choices,[]));

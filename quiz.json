@@ -41,71 +41,47 @@
     ]
   },
   {
-    "quiz_name": "sebila",
+    "quiz_name": "jd",
     "results": [
       {
-        "question": "the best color",
-        "correct_answer": "yellow",
-        "incorrect_answers": [
-          "red",
-          "blue",
-          "green"
-        ]
-      }
-    ]
-  },
-  {
-    "quiz_name": "so this is permanence",
-    "results": [
-      {
-        "question": "which track is not included in the album closer by JD?",
+        "question": "which track is not included in the album closer by JD? https://i.guim.co.uk/img/static/sys-images/Guardian/Pix/pictures/2011/5/27/1306490655493/Closer-001.jpg?width=1010&quality=45&auto=format&fit=max&dpr=2&s=2f13c868a8fb002c4a34c757c80cca7c",
         "correct_answer": "centuries",
         "incorrect_answers": [
           "twenty four hours",
           "the eternal",
           "decades"
         ]
-      }
-    ]
-  },
-  {
-    "quiz_name": "movie",
-    "results": [
+      },
       {
-        "question": "https://vibirai.ru/image/1116829.w640.jpg",
-        "correct_answer": "interstellr",
+        "question": "after death, what's left?",
+        "correct_answer": "new order",
         "incorrect_answers": [
-          "titanic",
-          "harry potter",
-          "star wars"
+          "old order",
+          "warsaw",
+          "unknown pleasures"
         ]
       }
     ]
   },
   {
-    "quiz_name": "s",
+    "quiz_name": "movie from one picture",
     "results": [
       {
-        "question": "s",
-        "correct_answer": "s",
+        "question": "from which movie is from the next image? https://i.pinimg.com/originals/ab/0c/74/ab0c74cc07a7b876235310979b68e0cf.jpg",
+        "correct_answer": "Throne of Blood",
         "incorrect_answers": [
-          "s",
-          "s",
-          "s"
+          "Ran",
+          "Yojimbo",
+          "Rashomon"
         ]
-      }
-    ]
-  },
-  {
-    "quiz_name": "e",
-    "results": [
+      },
       {
-        "question": "e",
-        "correct_answer": "e",
+        "question": "and for this one? https://i.pinimg.com/originals/00/f1/a7/00f1a74380746a97ad3d0394eae96ef8.jpg",
+        "correct_answer": "La Reine Margot",
         "incorrect_answers": [
-          "e",
-          "e",
-          "e"
+          "Tess",
+          "Emma",
+          "Anna Karenina"
         ]
       }
     ]

@@ -35,6 +35,7 @@ const quizAdd = async (interaction, question) => {
 };
 
 const quizHelp = async (interaction) => {
+
 	await sendEmbed(createEmbed_('✨ Quiz Generator ✨',
 		'Welcome to the Quiz Generator! To create your quiz you need to use  the following subcommands:\n\n '+
 		'✨ ****/quiz add**** : use this command to enter a question for your quiz ✨\n\n' +
@@ -63,11 +64,13 @@ const quizSave = async (interaction, quiz) => {
 
 const sendEmbed = async (embed, interaction) => { return await interaction.followUp({embeds: [embed]});}
 
-const createEmbed_ = (title, description) => {
+const createEmbed_ = (title, description, image) => {
 	return new MessageEmbed()
 		.setTitle(title)
 		.setColor('YELLOW')
-		.setDescription(description);
+		.setDescription(description)
+		.setImage(image);
+
 };
 
 module.exports = { createQuiz, zipQuestion, createEmbed_ };
