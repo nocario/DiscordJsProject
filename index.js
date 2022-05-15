@@ -7,7 +7,6 @@ const { token } = require('./config.json');
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-
 const client = new Discord.Client({ intents:
 		[ Intents.FLAGS.GUILDS,
 			Intents.FLAGS.GUILD_MESSAGES,

@@ -1,9 +1,11 @@
 const { MessageEmbed } = require('discord.js');
 const fs = require('node:fs');
 const R = require('ramda');
-const wait = require('node:timers/promises').setTimeout;
 //----------------------------------------------------------------------------------------------------------------------
+const readFile = fs.readFileSync('./quiz.json');
+const parsedData = JSON.parse(readFile);
 let results = [];
+//----------------------------------------------------------------------------------------------------------------------
 
 const createQuiz = async (interaction)  => {
 
@@ -31,23 +33,28 @@ const zipQuestion = (question, answer, options) => {
 const quizAdd = async (interaction, question) => {
 	results.push(question);
 	await interaction.followUp({ embeds: [ createEmbed_(`✨Question n°${results.length} added✨`,
-		' Write another one or end with -save.') ] });
+		' Write another one or end with ****/quiz save**** command.') ] });
 };
 
 const quizHelp = async (interaction) => {
 	await interaction.followUp({ embeds: [
 		createEmbed_('✨ Quiz Generator ✨',
 			'Welcome to the ****/quiz**** command. To create your quiz you need to use ' +
-        'the following subcommands:\n \n /quiz ****add****\n \n Use this command to add a ' +
-        'question to your quiz which is created automatically with the addition of the first ' +
-        'question.\n Question, correct answer and following options (3 max) are required.\n \n' +
-        '\n /quiz ****save****\n \n To avoid wasting time and effort, use this command to save ' +
-        'the quiz. \nThe name for your quiz will be requested.'),
+			'the following subcommands:\n \n ' +
+			'✨ ****/quiz add**** : use this command to enter a question for your quiz      ✨\n\n' +
+			'✨ ****/quiz save**** : without this command, all entering questions will be lost!!!     ✨\n\n' +
+			'✨ ****/start list**** : to see the list of all available quizzes    ✨ \n\n' +
+			'✨ ****/start random ****: to launch random quiz from quiz list   ✨ \n\n' +
+			'✨ ****/start select ****: to launch quiz selected by name    ✨ \n\n'
+		)
 	] });
 };
 
 const quizSave = async (interaction, quiz) => {
-	fs.writeFile('quiz.json', JSON.stringify([ quiz ],null,2),
+	parsedData.push(quiz);
+	const data = JSON.stringify(parsedData, null, 2);
+
+	fs.writeFile('quiz.json', data,
 		async function (err) {
 			if (err) console.log('error', err);
 			else await interaction.followUp(
