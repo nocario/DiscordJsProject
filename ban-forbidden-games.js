@@ -7,8 +7,8 @@ const BannedGames = [
 
 const INTERVAL_CHECK_WARNING = 20 * 60 * 1000;
 const INTERVAL_CHECK_BAN = 5 * 60 * 1000;
-//const INTERVAL_CHECK_WARNING = 5 * 1000;
-//const INTERVAL_CHECK_BAN = 2 * 1000;
+// Const INTERVAL_CHECK_WARNING = 5 * 1000;
+// const INTERVAL_CHECK_BAN = 2 * 1000;
 
 const checkPlayedGameAtInterval = client => setInterval(() => checkOnlineUsersPlayedGame(client), INTERVAL_CHECK_WARNING);
 
@@ -32,7 +32,7 @@ const curriedCheckIfPlayingForbiddenGame = R.curry(checkIfPlayingForbiddenGame)(
 const checkIfMemberIsOnline = guild => guild.members.fetch({ withPresences: true });
 const getOnlineMembers = R.pipe(R.map(checkIfMemberIsOnline));
 const getGuilds = client => client.guilds.cache.map(guild => client.guilds.cache.get(guild.id));
-const getValueOfMapCollection = arr => [ ...arr.values() ];
+const getValueOfMapCollection = array => [ ...array.values() ];
 const concatGuildsOnlineMember = R.pipe(R.map(getValueOfMapCollection), R.flatten);
 
 const timeOutWarning = warned => setTimeout(() => checkWarnedMember(warned), INTERVAL_CHECK_BAN);
@@ -49,7 +49,6 @@ const checkOnlineUserPlayedGame = R.pipe(
 	)));
 
 const checkOnlineUsersPlayedGame = R.pipe(checkOnlineUserPlayedGame, R.andThen(timeOutWarning));
-//const checkOnlineUsersPlayedGame = client => finish(client);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -59,12 +58,6 @@ const announceUserBan = member => member.guild.channels.cache.find(channel => ch
 	.send(`${member.user} has been banned`);
 
 const banUser = R.pipe(R.invoker(0, 'ban'), R.andThen(announceUserBan));
-const f = R.invoker(1, 'disableCommunicationUntil');
-const muteUser = member => {
-	const m = (Date.now() + (60 * 1000));
-	f(m, member);
-	announceUserBan(member);
-};
 
 const banWarnedMember = R.pipe(R.forEach(R.ifElse(
 	R.prop('bannable'),
@@ -86,4 +79,4 @@ const checkWarnedMember = R.pipe(
 
 //----------------------------------------------------------------------------------------------------------------------
 
-module.exports = { checkPlayedGameAtInterval, concatGuildsOnlineMember};
+module.exports = { checkPlayedGameAtInterval, concatGuildsOnlineMember };

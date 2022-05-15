@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-//const { clientId, token } = require('./config.json');
+
 require('dotenv').config();
 
 const commands = [
@@ -30,9 +30,9 @@ const commands = [
 				.setName('save')
 				.setDescription('please check /quiz help command before using this one')
 				.addStringOption(option => option.setName('name').setDescription('write name for your quiz').setRequired(true)),
-		)
+		),
 	//  .addStringOption(option => option.setName('input').setDescription('Enter a string'))
-	, new SlashCommandBuilder()
+	new SlashCommandBuilder()
 		.setName('start')
 		.setDescription('start quiz')
 		.addSubcommand(subcommand =>
@@ -52,14 +52,14 @@ const commands = [
 			subcommand
 				.setName('list')
 				.setDescription('show all quiz names'),
-		)
+		),
 
-	, new SlashCommandBuilder()
+	new SlashCommandBuilder()
 		.setName('modal')
-		.setDescription('testing part')
-	, new SlashCommandBuilder().setName('tis').setDescription('Replies with Tis but a scratch')
-	, new SlashCommandBuilder().setName('biggus').setDescription('Replies with the Biggus Dickus scene')
-	, new SlashCommandBuilder().setName('sacred').setDescription('Replies with Every Sperm is Sacred'),
+		.setDescription('testing part'),
+	new SlashCommandBuilder().setName('tis').setDescription('Replies with Tis but a scratch'),
+	new SlashCommandBuilder().setName('biggus').setDescription('Replies with the Biggus Dickus scene'),
+	new SlashCommandBuilder().setName('sacred').setDescription('Replies with Every Sperm is Sacred'),
 ]
 	.map(command => command.toJSON());
 
