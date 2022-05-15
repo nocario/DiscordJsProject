@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const { Intents } = require('discord.js');
 const R = require('ramda');
 const Discord = require('discord.js');
-const { token } = require('./config.json');
+//const { token } = require('./config.json');
 require('dotenv').config();
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
