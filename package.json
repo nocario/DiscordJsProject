@@ -32,6 +32,8 @@
     "discord-quiz": "^1.0.4",
     "discord-reply": "^0.1.2",
     "discord.js": "^13.6.0",
+    "dotenv": "^16.0.1",
+    "heroku": "^7.60.2",
     "parse-entities": "^4.0.0",
     "shuffle-array": "^1.0.1"
   }
