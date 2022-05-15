@@ -22,7 +22,6 @@
     "gulp-nodemon": "^2.5.0",
     "gulp-xo": "^0.25.0",
     "mocha": "^10.0.0",
-    "ramda": "^0.28.0",
     "xo": "^0.48.0"
   },
   "dependencies": {
@@ -35,6 +34,7 @@
     "dotenv": "^16.0.1",
     "heroku": "^7.60.2",
     "parse-entities": "^4.0.0",
+    "ramda": "^0.28.0",
     "shuffle-array": "^1.0.1"
   }
 }
