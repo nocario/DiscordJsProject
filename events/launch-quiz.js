@@ -1,20 +1,29 @@
 const { MessageEmbed } = require('discord.js');
 const shuffle = require('shuffle-array');
 const R = require('ramda');
-const data = require('../quiz.json');
+let data = require('../quiz.json');
 const wait = require('node:timers/promises').setTimeout;
 const { startQuiz } = require('./start-quiz.js');
+const fs = require("node:fs");
 //----------------------------------------------------------------------------------------------------------------------
 const TIME_MAX = 10000;
 let namesList = R.pluck('quiz_name', data);
 //----------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
+	updateData();
 	R.cond([
 		[ R.equals('random'), async () => await startQuiz(interaction, await quiz(interaction, shuffle(namesList)[0]))],
 		[ R.equals('select'), async () => await nameSelected(interaction, interaction.options.getString('selected'))],
 		[ R.equals('list'), async () => await listQuiz(interaction)]
 	])(interaction.options.getSubcommand());
+}
+
+const updateData = () => {
+	const readFile = fs.readFileSync('quiz.json');
+	const parsedData = JSON.parse(readFile);
+	data = parsedData;
+	namesList = R.pluck('quiz_name',data);
 }
 
 const nameSelected = async (interaction, name) => {
