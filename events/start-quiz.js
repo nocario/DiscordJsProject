@@ -10,6 +10,7 @@ const TIME_MAX = 10000;
 let participants = {};
 const reactions = [ '💛', '💚', '💙', '💜' ];
 //----------------------------------------------------------------------------------------------------------------------
+
 const diff = (a,b) => {return a[1] - b[1]};
 const getLowestScoringPlayer = R.pipe(R.toPairs, R.sort(diff), R.head, R.head);
 
@@ -112,7 +113,7 @@ const collectorEnd = (list, answer, interaction) => (collector) => collector.on(
 
     const result = R.ifElse(
         R.isEmpty,
-        R.always(createEmbed_('Time\'s Up! No one got it.... 🦉', `\n The correct answer was ${answer}`)),
+        R.always(createEmbed_('Time\'s Up! No one got it.... 🦉', `\n The correct answer was ${answer}\n`)),
         R.always(createEmbed_('Great! Here\'s who got it first 🍒:\n',
             `${R.join(', ', list)} \n The correct answer was ${answer}`,
         )),

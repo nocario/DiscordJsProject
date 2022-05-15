@@ -6,7 +6,7 @@ const wait = require('node:timers/promises').setTimeout;
 const { startQuiz } = require('./start-quiz.js');
 //----------------------------------------------------------------------------------------------------------------------
 const TIME_MAX = 10000;
-const namesList = R.pluck('quiz_name', data);
+let namesList = R.pluck('quiz_name', data);
 //----------------------------------------------------------------------------------------------------------------------
 
 const launchQuiz = async (interaction) => {
