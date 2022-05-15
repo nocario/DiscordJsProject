@@ -2,7 +2,7 @@ const shuffle = require('shuffle-array');
 const R = require('ramda');
 const {MessageEmbed} = require("discord.js");
 const wait = require('node:timers/promises').setTimeout;
-const {fetchLowestScoringPlayer} = require('../banQuiz');
+const {fetchLowestScoringPlayer} = require('../ban-quiz');
 
 //----------------------------------------------------------------------------------------------------------------------
 const QUESTION_INTERVAL = 15000;
@@ -13,6 +13,7 @@ const reactions = [ '💛', '💚', '💙', '💜' ];
 const diff = (a,b) => {return a[1] - b[1]};
 const getLowestScoringPlayer = R.pipe(R.toPairs, R.sort(diff), R.head, R.head);
 
+//----------------------------------------------------------------------------------------------------------------------
 const startQuiz = async (interaction, results) => {
 
     for (const result of results) {
@@ -33,19 +34,30 @@ const startQuiz = async (interaction, results) => {
             await wait(QUESTION_INTERVAL),
         );
     }
-    const curriedFetchLowestScoringPlayer = R.curry(fetchLowestScoringPlayer)(interaction);
-    R.ifElse(
-        R.pipe(R.keys, R.length, R.lte(2)),
-        R.pipe(getLowestScoringPlayer, curriedFetchLowestScoringPlayer),
-        R.always(false)
-    )(participants);
-    const fetchUserUsername = async (interaction, list) => `${await interaction.guild.members.fetch(list[0])}: ${list[1]}`
-    const curriedFetchUserUsername = R.curry(fetchUserUsername)(interaction);
-    const getUsersListScore = R.pipe(R.toPairs, R.map(curriedFetchUserUsername), R.bind(Promise.all, Promise))
+
+    checkIfMoreThanOnePlayer(interaction, participants);
+
+
+    const getUsersListScore = R.pipe(R.toPairs, R.map(fetchUserUsername(interaction)), R.bind(Promise.all, Promise));
+
     const embed = createEmbed_('Score', `${await getUsersListScore(participants)}`);
     await sendEmbed(embed, interaction);
+
     participants = R.empty(participants)
 }
+//----------------------------------------------------------------------------------------------------------------------
+
+const checkIfMoreThanOnePlayer = (interaction, participants) => R.ifElse(
+    R.pipe(R.keys, R.length, R.lte(2)),
+    R.pipe(getLowestScoringPlayer, R.curry(fetchLowestScoringPlayer)(interaction)),
+    R.always(false)
+)(participants);
+
+const fetchUserUsername = (interaction) => async (list) => `${await interaction.guild.members.fetch(list[0])}: ${list[1]}\n`
+
+
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 const compose = (...funcs) => initialArg => funcs.reduce((acc, func) => func(acc), initialArg);
