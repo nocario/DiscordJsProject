@@ -26,12 +26,12 @@ const startQuiz = async (interaction, results) => {
 
         R.pipe(
             compose(addReactions)(messageEmbed),
-            compose(collectorOn(usersWithCorrectAnswer, correctAnswerEmoji(correctAnswer, choices)),
-                collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))
-            (collector(messageEmbed)),
+            compose(
+                collectorOn(usersWithCorrectAnswer, correctAnswerEmoji(correctAnswer, choices)),
+                collectorEnd(usersWithCorrectAnswer, correctAnswer, interaction))(collector(messageEmbed)
+            ),
             await wait(QUESTION_INTERVAL),
         );
-        //await wait(QUESTION_INTERVAL);
     }
     const curriedFetchLowestScoringPlayer = R.curry(fetchLowestScoringPlayer)(interaction);
     R.ifElse(

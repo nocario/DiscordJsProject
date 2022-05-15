@@ -18,22 +18,20 @@ const launchQuiz = async (interaction) => {
 }
 
 const nameSelected = async (interaction, name) => {
-	if (R.includes(name, namesList)){ // check if quiz even exist, doesnt work with R.if else
+	if (R.includes(name, namesList)){
 		await startQuiz(interaction, await quiz(interaction, name))
 	}
 	else {
 		await sendEmbed(
-			createEmbed_('Quiz not found 😢','Use /start list to get the available'), interaction);
+			createEmbed_('Quiz not found 😢','Use /start list to get the available'), interaction
+		);
 	}
 }
 
-const resultsByQuizName = (quizName) => { return R.prop('results', R.find(R.propEq('quiz_name', quizName))(data))}
+const resultsByQuizName = (quizName) => { return R.prop('results', R.find(R.propEq('quiz_name', quizName))(data));}
 
 const listQuiz = async (interaction) =>  {
-	return await sendEmbed(
-		createEmbed_('✨ All available quiz ✨', R.join('\n', namesList)),
-		interaction
-	);
+	return await sendEmbed(createEmbed_('✨ All available quiz ✨', R.join('\n', namesList)), interaction);
 }
 
 const quiz = async (interaction, name) => {
@@ -43,11 +41,12 @@ const quiz = async (interaction, name) => {
 
 const createStartQuizMessage = async (interaction, title) =>{
 	const embed = createEmbed_(`✨ ${title} ✨`,
-		`You have ${TIME_MAX / 1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫
-		\n`);
+		`You have ${TIME_MAX/1000} seconds for each question.\n Players with incorrect answers will be 🌚🔫\n`
+	);
 	await sendEmbed(embed, interaction);
 	return await wait(TIME_MAX/2);
 }
+
 const sendEmbed = async (embed, interaction) => { return await interaction.followUp({embeds: [embed]});}
 
 const createEmbed_ = (title, description) => {
