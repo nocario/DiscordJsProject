@@ -1,4 +1,4 @@
-// Require the necessary discord.js classes
+
 const fs = require('node:fs');
 const { Intents } = require('discord.js');
 const R = require('ramda');
