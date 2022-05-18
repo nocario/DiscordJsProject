@@ -7,6 +7,14 @@ plusieurs actions sur le chat d'un serveur.
 
 ```
 ---
+```ruby
+Pour démarrer le bot il faut un fichier .env avec DISCORD_TOKEN qui correspond au token discord.
+Ensuite il suffit d'utiliser la commande: 
+```
+```
+npm run start
+```
+---
 
 ```ruby
 Renvoyer une vidéo YouTube sur le chat
@@ -51,6 +59,10 @@ Création et lancement des quiz, le perdant du quiz parmi les participants se fo
 </p>
 </details>
 
+```ruby
+Pour finir le bot peut bannir des utilisateurs si ils jouent a des jeux faisant partie de la liste de jeux interdis
+```
+---
 ```ruby
 Created with <з (and pain) by Antoine Ghidini, Laetitia Kamwag & Sebila Doubaeva
 ```
